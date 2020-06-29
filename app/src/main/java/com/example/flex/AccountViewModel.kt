@@ -19,12 +19,16 @@ class AccountViewModel(private val app: Application) : AndroidViewModel(app) {
     private val mMainUser:LiveData<User>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
     val isMustSignIn: MutableLiveData<Boolean?>
+    val isLoginUpdating:LiveData<Boolean>
+    val isRegisterUpdating:LiveData<Boolean>
 
     init {
         allPosts = mRepository.getAllPosts()
         mMainUser = mRepository.mainUser
         isPasswordCanBeChanged = mRepository.isPasswordCanBeChanged
         isMustSignIn = mRepository.isMustSignIn
+        isLoginUpdating=mRepository.isLoginUpdating
+        isRegisterUpdating=mRepository.isRegisterUpdating
     }
     suspend fun getUserValueFromDB(userId:Long):User{
         return mRepository.getUserValueFromDB(userId)

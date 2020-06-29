@@ -89,9 +89,9 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 currentPostPosition += dy
-                if (recyclerView.adapter != null){
+                if (recyclerView.adapter != null) {
                     if (recyclerView.adapter!!.itemCount.toLong() - currentPostPosition < 3) {
-                        refreshPosts(postAdapter.getItemByPosition(postAdapter.itemCount-1).id)
+                        refreshPosts(postAdapter.getItemByPosition(postAdapter.itemCount - 1).id)
                     }
                 }
             }

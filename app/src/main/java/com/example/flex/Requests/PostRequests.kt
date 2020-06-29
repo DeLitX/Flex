@@ -75,7 +75,7 @@ class PostRequests(
                 if (response.isSuccessful) {
                     mPostRequestsInteraction.updatePost(post)
                 } else if (response.code == MainData.ERR_403) {
-                    mPostRequestsInteraction.mustSignIn()
+                    makeUserSignIn()
                 } else {
 
                 }
@@ -105,7 +105,7 @@ class PostRequests(
                 if (response.isSuccessful) {
                     mPostRequestsInteraction.updatePost(post)
                 } else if (response.code == MainData.ERR_403) {
-                    mPostRequestsInteraction.mustSignIn()
+                    makeUserSignIn()
                 } else {
 
                 }
@@ -137,7 +137,7 @@ class PostRequests(
                 if (response.isSuccessful) {
 
                 } else if (response.code == MainData.ERR_403) {
-                    mPostRequestsInteraction.mustSignIn()
+                    makeUserSignIn()
                 } else {
 
                 }
@@ -201,7 +201,7 @@ class PostRequests(
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
-                    mPostRequestsInteraction
+                    makeUserSignIn()
                 } else {
 
                 }
@@ -265,7 +265,7 @@ class PostRequests(
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
-                    mPostRequestsInteraction.mustSignIn()
+                    makeUserSignIn()
                 } else {
 
                 }
@@ -323,7 +323,7 @@ class PostRequests(
                             }
                         }
                     } else if (response.code == MainData.ERR_403) {
-                        mPostRequestsInteraction.mustSignIn()
+                        makeUserSignIn()
                     } else {
 
                     }
@@ -332,11 +332,15 @@ class PostRequests(
         }
     }
 
+    private fun makeUserSignIn() {
+        mPostRequestsInteraction.setMustSignIn(true)
+    }
+
     interface PostRequestsInteraction {
-        fun mustSignIn()
+        fun setMustSignIn(value: Boolean)
         fun savePostsToDb(posts: List<Post>)
         fun saveCommentsToDb(comments: List<Comment>)
         fun updatePost(post: Post)
-        fun setFeedRefreshState(value:Boolean)
+        fun setFeedRefreshState(value: Boolean)
     }
 }

@@ -2,11 +2,10 @@ package com.example.flex.Activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.flex.AccountViewModel
 import com.example.flex.R
@@ -17,6 +16,7 @@ class Registration : AppCompatActivity() {
     private lateinit var mPassword: EditText
     private lateinit var mRepeatPassword: EditText
     private lateinit var mViewModel: AccountViewModel
+    private lateinit var mUpdateBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +38,18 @@ class Registration : AppCompatActivity() {
         mLogin = findViewById(R.id.login)
         mPassword = findViewById(R.id.password)
         mRepeatPassword = findViewById(R.id.repeat_password)
+        mUpdateBar = findViewById(R.id.register_update_circle)
         val signUp = findViewById<Button>(R.id.sign_up_button)
         val haveAcc = findViewById<TextView>(R.id.have_acc)
+        mViewModel.isRegisterUpdating.observe(this, Observer {
+            mUpdateBar.visibility = if (it) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            signUp.isEnabled = !it
+            mUpdateBar.isIndeterminate = it
+        })
         haveAcc.setOnClickListener {
             val intent = Intent(this, SignIn().javaClass)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)

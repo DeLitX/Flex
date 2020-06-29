@@ -3,10 +3,8 @@ package com.example.flex.Activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,13 +17,14 @@ class SignIn : AppCompatActivity() {
     private lateinit var mLogin: EditText
     private lateinit var mPassword: EditText
     private lateinit var mViewModel: AccountViewModel
+    private lateinit var mUpdateBar: ProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
-        mViewModel=ViewModelProvider(this).get(AccountViewModel::class.java)
+        mViewModel = ViewModelProvider(this).get(AccountViewModel::class.java)
         mViewModel.isMustSignIn.observe(this, Observer {
-            if(it==false){
-                val intent=Intent(this, MainActivity::class.java)
+            if (it == false) {
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             }
@@ -41,6 +40,16 @@ class SignIn : AppCompatActivity() {
 
     private fun setActionListener() {
         val signInButton = findViewById<Button>(R.id.sign_in_button)
+        mUpdateBar = findViewById(R.id.login_update_circle)
+        mViewModel.isLoginUpdating.observe(this, Observer {
+            mUpdateBar.visibility = if (it) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            mUpdateBar.isIndeterminate = it
+            signInButton.isEnabled = !it
+        })
         mLogin = findViewById(R.id.login)
         mPassword = findViewById(R.id.password)
         val dontAcc = findViewById<TextView>(R.id.dont_acc)
@@ -51,7 +60,7 @@ class SignIn : AppCompatActivity() {
         }
         signInButton.setOnClickListener {
             if (mPassword.text.toString().trim() != "" && mLogin.text.toString().trim() != "") {
-                mViewModel.login(mLogin.text.toString(),mPassword.text.toString())
+                mViewModel.login(mLogin.text.toString(), mPassword.text.toString())
             } else
                 Toast.makeText(this, "try again", Toast.LENGTH_LONG).show()
         }

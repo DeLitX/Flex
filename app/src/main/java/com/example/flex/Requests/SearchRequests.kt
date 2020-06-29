@@ -15,7 +15,7 @@ import java.net.CookieManager
 import java.net.CookiePolicy
 
 class SearchRequests(
-    private val mIsMustSignIn: MutableLiveData<Boolean?>,
+    private val mSearchInteraction: SearchInteraction,
     private val mCsrftoken: String,
     private val mSessionId: String
 ) {
@@ -55,6 +55,7 @@ class SearchRequests(
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
         val call = client.newCall(request)
+        mSearchInteraction.setSearchUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
 
@@ -80,10 +81,11 @@ class SearchRequests(
                             userDao.insertAll(users)
                             searchResult.postValue(users)
                             deleteOddsFromDB(previousList, users, userDao)
+                            mSearchInteraction.setSearchUpdating(false)
                         }
                     }
                 } else if (response.code == MainData.ERR_401) {
-                    mIsMustSignIn.postValue(true)
+                   mSearchInteraction.setMustSignIn(true)
                 } else {
 
                 }
@@ -148,5 +150,9 @@ class SearchRequests(
 
         }
         return list
+    }
+    interface SearchInteraction{
+        fun setSearchUpdating(value:Boolean)
+        fun setMustSignIn(value:Boolean)
     }
 }

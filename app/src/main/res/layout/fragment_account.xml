@@ -26,9 +26,7 @@
         android:layout_alignTop="@id/user_icon_main"
         android:layout_alignBottom="@id/user_icon_main"
         android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
         android:layout_toEndOf="@id/user_icon_main"
-        android:layout_toRightOf="@id/user_icon_main"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -52,9 +50,7 @@
         android:layout_alignTop="@id/user_icon_main"
         android:layout_alignBottom="@id/user_icon_main"
         android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
         android:layout_toEndOf="@+id/followers_layout"
-        android:layout_toRightOf="@+id/followers_layout"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -83,18 +79,18 @@
             android:id="@+id/button_follow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/main_app_buttons"
             android:text="@string/follow"
-            android:layout_weight="1"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/button_connect_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/main_app_buttons"
             android:text="@string/chat"
-            android:layout_weight="1"
             android:textSize="15sp" />
     </LinearLayout>
 

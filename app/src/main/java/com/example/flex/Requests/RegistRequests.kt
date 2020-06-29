@@ -70,7 +70,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .build()
 
         val call = mClient.newCall(request)
-
+        mRegistRequestInteraction.setLoginUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
             }
@@ -83,10 +83,11 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         mRegistRequestInteraction.setCSRFToken(cookies[0].value)
                         mRegistRequestInteraction.setSessionId(cookies[1].value)
                         mRegistRequestInteraction.setYourId(body.toLong())
-                        mRegistRequestInteraction.notMustSignIn()
+                        mRegistRequestInteraction.setMustSignIn(false)
+                        mRegistRequestInteraction.setLoginUpdating(false)
                     }
                 } else {
-
+                    mRegistRequestInteraction.setLoginUpdating(false)
                 }
             }
         })
@@ -119,7 +120,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         mRegistRequestInteraction.setCSRFToken("")
                         mRegistRequestInteraction.setSessionId("")
                         mRegistRequestInteraction.setYourId(0)
-                        mRegistRequestInteraction.mustSignIn()
+                        mRegistRequestInteraction.setMustSignIn(true)
                     }
                 } else {
 
@@ -154,11 +155,6 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                 if (response.isSuccessful) {
                     cookies = cookieManager.cookieStore.cookies
                 } else if (response.code == MainData.ERR_403) {
-                    /*context!!.runOnUiThread {
-                        val intent = Intent(context, SignIn().javaClass)
-                        context.startActivity(intent)
-                        context.finish()
-                    }*/
                 } else {
 
                 }
@@ -181,6 +177,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .build()
         val call = mClient.newCall(request)
+        mRegistRequestInteraction.setRegisterUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 cookies.add(HttpCookie("you failed", "you failed"))
@@ -192,9 +189,10 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         cookies = cookieManager.cookieStore.cookies
                         /*repository.setCSRFToken(cookies[0].value)
                         repository.setSessionId(cookies[1].value)*/
+                        mRegistRequestInteraction.setRegisterUpdating(false)
                     }
                 } else {
-
+                    mRegistRequestInteraction.setRegisterUpdating(false)
                 }
             }
         })
@@ -204,7 +202,8 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         fun setCSRFToken(csrftoken: String)
         fun setSessionId(sessionId: String)
         fun setYourId(id: Long)
-        fun mustSignIn()
-        fun notMustSignIn()
+        fun setMustSignIn(value:Boolean)
+        fun setLoginUpdating(value:Boolean)
+        fun setRegisterUpdating(value:Boolean)
     }
 }

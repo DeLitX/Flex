@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -20,18 +21,20 @@ import com.example.flex.Activities.SignIn
 
 class SearchRecyclerFragment : Fragment(), SearchAdapter.OnUserClickListener {
 
-    lateinit var recycler: RecyclerView
-    lateinit var searchAdapter: SearchAdapter
-    lateinit var v: View
+    private lateinit var mRecycler: RecyclerView
+    private lateinit var mSearchAdapter: SearchAdapter
+    private lateinit var v: View
     private lateinit var mViewModel: SearchViewModel
+    private lateinit var mUpdateBar:ProgressBar
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         v = inflater.inflate(R.layout.fragment_search_recycler, container, false)
+        mUpdateBar=v.findViewById(R.id.search_update_circle)
         mViewModel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
         mViewModel.searchResult.observe(viewLifecycleOwner, Observer {
-            searchAdapter.setUsers(it)
+            mSearchAdapter.setUsers(it)
         })
         mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -41,14 +44,25 @@ class SearchRecyclerFragment : Fragment(), SearchAdapter.OnUserClickListener {
             }
         })
         loadRecyclerView()
+        mViewModel.isSearchUpdates.observe(viewLifecycleOwner, Observer {
+            if(it){
+                mRecycler.visibility=View.GONE
+                mUpdateBar.visibility=View.VISIBLE
+                mUpdateBar.isIndeterminate=true
+            }else{
+                mRecycler.visibility=View.VISIBLE
+                mUpdateBar.visibility=View.GONE
+                mUpdateBar.isIndeterminate=false
+            }
+        })
         return v
     }
 
     private fun loadRecyclerView() {
-        recycler = v.findViewById(R.id.recycler_search)
-        recycler.layoutManager = LinearLayoutManager(v.context)
-        searchAdapter = SearchAdapter(this)
-        recycler.adapter = searchAdapter
+        mRecycler = v.findViewById(R.id.recycler_search)
+        mRecycler.layoutManager = LinearLayoutManager(v.context)
+        mSearchAdapter = SearchAdapter(this)
+        mRecycler.adapter = mSearchAdapter
     }
 
     override fun onUserClick(user: User) {

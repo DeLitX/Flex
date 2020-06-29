@@ -41,7 +41,7 @@ class PostAdapter(
     }
 
 }) {
-    fun getItemByPosition(position: Int):Post{
+    fun getItemByPosition(position: Int): Post {
         return getItem(position)
     }
 
@@ -67,7 +67,17 @@ class PostAdapter(
         init {
             mPicasso.setIndicatorsEnabled(true)
             mainUserAvatar.setOnClickListener {
-                mOnUserClickListener.onUserClick(post.mainUser)
+                if (post.mainUser.id != 0.toLong()) {
+                    mOnUserClickListener.onUserClick(post.mainUser)
+                } else {
+                    mOnUserClickListener.onUserClick(
+                        User(
+                            id = post.belongsTo,
+                            name = post.mainUser.name,
+                            imageUrl = post.mainUser.imageUrl
+                        )
+                    )
+                }
             }
             fireIcon.setOnClickListener {
                 if (!isLiked) {
@@ -101,7 +111,7 @@ class PostAdapter(
                 fireIcon.setTextColor(Color.GRAY)
             }
             if (post.imageUrl != "") {
-                mPostsInteraction.photoDownload(post.imageUrl,postImage)
+                mPostsInteraction.photoDownload(post.imageUrl, postImage)
             }
             if (post.postText != "") {
                 postText.text = post.postText
@@ -130,7 +140,7 @@ class PostAdapter(
         private fun setMainUser(user: User?) {
             if (user != null) {
                 if (user.imageUrl != "") {
-                    mPostsInteraction.photoDownload(user.imageUrl,mainUserAvatar)
+                    mPostsInteraction.photoDownload(user.imageUrl, mainUserAvatar)
                 }
                 mainUserName.text = user.name
             }

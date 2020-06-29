@@ -99,7 +99,7 @@ class UserRequests(
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
-                    mUserRequestsInteraction.mustSignIn()
+                    mUserRequestsInteraction.setMustSignIn(true)
                 } else {
 
                 }
@@ -156,7 +156,7 @@ class UserRequests(
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
-                    mUserRequestsInteraction.mustSignIn()
+                    mUserRequestsInteraction.setMustSignIn(true)
                 } else {
 
                 }
@@ -187,7 +187,7 @@ class UserRequests(
                     val isLogin = response.header("isLogin", "true")
                     mUserRequestsInteraction.follow(userId)
                 } else if (response.code == MainData.ERR_403) {
-                    mUserRequestsInteraction.mustSignIn()
+                    mUserRequestsInteraction.setMustSignIn(true)
                 } else {
 
                 }
@@ -218,7 +218,7 @@ class UserRequests(
                     val isLogin = response.header("isLogin", "true")
                     mUserRequestsInteraction.unfollow(userId)
                 } else if (response.code == MainData.ERR_403) {
-                    mUserRequestsInteraction.mustSignIn()
+                    mUserRequestsInteraction.setMustSignIn(true)
                 } else {
 
                 }
@@ -231,7 +231,7 @@ class UserRequests(
         fun setFollowersCount(userId: Long, count: Long)
         fun follow(userId: Long)
         fun unfollow(userId:Long)
-        fun mustSignIn()
+        fun setMustSignIn(value:Boolean)
         fun savePostsToDb(posts: List<Post>, idOfUser: Long)
         fun updateUserInDb(user: User)
     }

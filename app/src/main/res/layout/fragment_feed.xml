@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/colorWhite">
 
     <RelativeLayout
         android:id="@+id/top_panel"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorGray">
+        android:background="@color/colorGray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/chatroom_button"
@@ -22,11 +22,12 @@
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_chat" />
     </RelativeLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/feed_refresh"
-        app:layout_constraintTop_toBottomOf="@id/top_panel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/top_panel">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/main_recycler_view"

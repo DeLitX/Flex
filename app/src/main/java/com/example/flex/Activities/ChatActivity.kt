@@ -39,31 +39,32 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
         loadRecycler()
         mViewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         val chatId = intent.getLongExtra(MainData.PUT_CHAT_ID, 0)
-        val lifecycleOwner:LifecycleOwner=this
-        CoroutineScope(IO).launch {
-            if (chatId == 0.toLong()) {
-                mViewModel.chatId.observe(lifecycleOwner, Observer {
-                    mChatId = it
-                    CoroutineScope(IO).launch {
-                        setChatObserver(it)
-                    }
-                })
+        val lifecycleOwner: LifecycleOwner = this
+        if (chatId == 0.toLong()) {
+            mViewModel.chatId.observe(lifecycleOwner, Observer {
+                mChatId = it
+                CoroutineScope(IO).launch {
+                    setChatObserver(it)
+                }
+            })
+            CoroutineScope(IO).launch {
                 val intent = intent
-//                mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)
-//                mUserName = intent.getStringExtra(MainData.PUT_USER_NAME)
+                mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)
+                mUserName = intent.getStringExtra(MainData.PUT_USER_NAME)
                 mViewModel.createChat(mUserId)
                 mViewModel.connectChat(mUserName)
-            } else {
+            }
+        } else {
+            CoroutineScope(IO).launch {
                 mChatId = chatId
                 setChatObserver(chatId)
                 mViewModel.connectChat(chatId)
+                val user = mViewModel.getMainUser()
+                mUserName = user.name
+                mUserId = user.id
             }
-
-            val user = mViewModel.getMainUser()
-            mUserName = user.name
-            mUserId = user.id
-            setActionListener()
         }
+        setActionListener()
     }
 
     private fun loadRecycler() {
