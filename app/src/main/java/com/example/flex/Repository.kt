@@ -8,10 +8,7 @@ import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.flex.DataBase.*
-import com.example.flex.POJO.ChatMessage
-import com.example.flex.POJO.Comment
-import com.example.flex.POJO.Post
-import com.example.flex.POJO.User
+import com.example.flex.POJO.*
 import com.example.flex.Requests.*
 import com.example.flex.Websockets.ChatInteraction
 import com.example.flex.Websockets.ChatWebsocket
@@ -24,19 +21,22 @@ import java.io.File
 import java.util.*
 
 class Repository(private val application: Application) : UserRequests.UserRequestsInteraction,
-    PostRequests.PostRequestsInteraction, RegistRequests.RegistRequestInteraction, ChatInteraction {
+    PostRequests.PostRequestsInteraction, RegistRequests.RegistRequestInteraction, ChatInteraction,ChatRequests.ChatroomInteraction {
     val postDao: PostDao
     val postsInFeed: LiveData<List<Post>>
     private val mPosts: LiveData<List<Post>>
     private val mUserDao: UserDao
     private val mCommentDao: CommentDao
     private val mChatMessageDao: ChatMessageDao
-    private lateinit var mChatWebsocket: ChatWebsocket
+    private val mChatWebsocket: ChatWebsocket = makeChatWebsocket()
+    private val mChatDao:ChatDao
     val mainUser: LiveData<User>
     var searchResult: MutableLiveData<List<User>>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
     val isMustSignIn: MutableLiveData<Boolean?>
     val chatId: MutableLiveData<Long>
+    val chatList:LiveData<List<Chat>>
+    val isRefreshFeed:MutableLiveData<Boolean>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -53,10 +53,12 @@ class Repository(private val application: Application) : UserRequests.UserReques
         mCommentDao = postDatabase.getCommentDao()
         postsInFeed = postDao.getPostsToFeed()
         chatId = MutableLiveData()
+        mChatDao=postDatabase.getChatDao()
+        chatList=mChatDao.getChats()
+        isRefreshFeed= MutableLiveData(false)
     }
 
     fun createChat(userId: Long) {
-        mChatWebsocket = makeChatWebsocket()
         mChatWebsocket.createChat(userId)
     }
 
@@ -90,12 +92,21 @@ class Repository(private val application: Application) : UserRequests.UserReques
     fun getPostsForAccount(userId: Long): LiveData<List<Post>> {
         return postDao.getAllPostsOfUser(userId)
     }
+    fun closeChat(){
+        return mChatWebsocket.closeWebsocket()
+    }
 
     fun connectToChat(user: String) {
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val userId = sharedPreferences.getLong(MainData.YOUR_ID, 0)
         mChatWebsocket.connectChat(user, userId)
+    }
+    fun connectToChat(chatId: Long){
+        val sharedPreferences =
+            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getLong(MainData.YOUR_ID, 0)
+        mChatWebsocket.connectChat(chatId, userId)
     }
 
     suspend fun getUserById(userId: Long): User {
@@ -265,6 +276,9 @@ class Repository(private val application: Application) : UserRequests.UserReques
             deleteAllPostsAsync()
         }
     }
+    fun refreshChats(){
+        makeChatRequest().getChats()
+    }
 
     fun getMiniPostsForAcc(id: Long, currentUser: User?) {
         CoroutineScope(IO).launch {
@@ -332,6 +346,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
         CoroutineScope(IO).launch {
             followUserAsync(userId)
         }
+    }
+    suspend fun getMainUser():User{
+        val id=getYourId()
+        return getUserValueFromDB(id)
     }
 
     suspend fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
@@ -497,6 +515,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
         val cache = Cache(httpCacheDirectory, cacheSize)
         return PhotoRequests(isMustSignIn, pair.first, pair.second,cache)
     }
+    private fun makeChatRequest():ChatRequests{
+        val pair=getCSRFTokenAndSessionId()
+        return ChatRequests(this,pair.first,pair.second)
+    }
 
     private fun getCSRFToken(): String {
         val sharedPreferences =
@@ -571,6 +593,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
         postDao.insert(post)
     }
 
+    override fun setFeedRefreshState(value: Boolean) {
+        isRefreshFeed.postValue(value)
+    }
+
     override fun savePostsToDb(posts: List<Post>, idOfUser: Long) {
         postDao.insertAll(posts)
     }
@@ -595,5 +621,9 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun setChatId(chatId: Long) {
         this.chatId.postValue(chatId)
+    }
+
+    override fun saveChatsToDB(chats: List<Chat>) {
+        mChatDao.insert(chats)
     }
 }

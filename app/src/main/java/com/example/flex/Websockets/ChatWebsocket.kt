@@ -14,7 +14,7 @@ class ChatWebsocket(
     val mChatInteraction: ChatInteraction,
     val csrftoken: String,
     val sessionId: String,
-    private val mUserId:Long
+    private val mUserId: Long
 ) {
     var user: String = ""
         private set
@@ -22,36 +22,44 @@ class ChatWebsocket(
     val client: OkHttpClient = OkHttpClient.Builder().build()
     var isFirst: Boolean = true
     private var mWebSocket: WebSocket? = null
-    private val mMaxCountOfMessages=10
-    fun connectChat(user: String,yourUserId:Long) {
+    private val mMaxCountOfMessages = 10
+    fun connectChat(chatId: Long, yourUserId: Long) {
+        val link = "wss://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.GROUP_CHAT}"
+        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
+        this.chatId=chatId
+        connectWebsocket(link, cookie)
+    }
+
+    fun connectChat(user: String, yourUserId: Long) {
+        val link = "wss://${MainData.BASE_URL}/${MainData.CHATROOM}/$user"
+        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId"
+        connectWebsocket(link, cookie)
+    }
+
+    private fun connectWebsocket(link: String, cookie: String) {
         this.user = user
         val request = Request.Builder()
-            .url("wss://${MainData.BASE_URL}/${MainData.CHAT}/$user")
-            .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId")
+            .url(link)
+            .addHeader("Cookie", cookie)
             .build()
         mWebSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 if (true) {
                 }
-                /*val body=response.body?.string()
-                chatId=body.toString().toLong()*/
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (isFirst) {
-                    //chatId = text.toLong()
-                    //mChatInteraction.setChatId(chatId)
                     isFirst = false
                 } else {
-                    val temp=JSONObject(text)
-
+                    val temp = JSONObject(text)
                     mChatInteraction.receiveMessage(
                         ChatMessage(
-                            text =temp["text"].toString(),
+                            text = temp["text"].toString(),
                             timeSent = temp["time"].toString().toLong(),
                             belongsToChat = chatId,
                             userId = temp["user_id"].toString().toLong(),
-                            isMy = temp["user_id"].toString().toLong()==mUserId
+                            isMy = temp["user_id"].toString().toLong() == mUserId
                         )
                     )
                 }
@@ -76,10 +84,15 @@ class ChatWebsocket(
             }
         })
     }
+    fun closeWebsocket(){
+        if(mWebSocket!=null){
+            mWebSocket!!.cancel()
+        }
+    }
 
     fun sendMessage(message: ChatMessage) {
         if (mWebSocket != null) {
-            val text=encodeMessageToJson(message)
+            val text = encodeMessageToJson(message)
             mWebSocket!!.send(text)
         }
     }
@@ -90,7 +103,7 @@ class ChatWebsocket(
             .add("csrfmiddlewaretoken", csrftoken)
             .build()
         val request = Request.Builder()
-            .url("https://${MainData.BASE_URL}/${MainData.CHAT}/${MainData.CREATE_CHAT}")
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CREATE_CHAT}")
             .post(formBody)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=${csrftoken}; sessionid=${sessionId}")
@@ -119,14 +132,15 @@ class ChatWebsocket(
                                 for (i in 0 until length) {
                                     val value = messages[i]
                                     if (value is JSONObject) {
-                                        val temp=JSONObject(value.toString())
+                                        val temp = JSONObject(value.toString())
                                         listOfMessages.add(
                                             ChatMessage(
-                                                text =temp["text"].toString(),
+                                                text = temp["text"].toString(),
                                                 timeSent = temp["time"].toString().toLong(),
                                                 belongsToChat = chatId,
                                                 userId = temp["sender_id"].toString().toLong(),
-                                                isMy = temp["sender_id"].toString().toLong()==mUserId
+                                                isMy = temp["sender_id"].toString()
+                                                    .toLong() == mUserId
                                             )
                                         )
                                     }
@@ -134,7 +148,7 @@ class ChatWebsocket(
                             }
                             setThisChatId(chatId)
                             mChatInteraction.setChatId(chatId)
-                            if(listOfMessages.size<mMaxCountOfMessages){
+                            if (listOfMessages.size < mMaxCountOfMessages) {
                                 mChatInteraction.clearChat(chatId)
                             }
                             mChatInteraction.receiveMessages(listOfMessages)
@@ -147,19 +161,21 @@ class ChatWebsocket(
             }
         })
     }
-    private fun setThisChatId(chatId: Long){
-        this.chatId=chatId
+
+    private fun setThisChatId(chatId: Long) {
+        this.chatId = chatId
     }
 
     private fun encodeMessageToJson(message: ChatMessage): String {
         return "{" +
                 "\"text\":\"${message.text}\"," +
                 "\"time\":\"${message.timeSent}\"," +
-                "\"user_id\":\"${message.userId}\""+
+                "\"user_id\":\"${message.userId}\"" +
                 "}"
 
     }
 }
+
 interface ChatInteraction {
     fun receiveMessage(message: ChatMessage)
     fun receiveMessages(messages: List<ChatMessage>)

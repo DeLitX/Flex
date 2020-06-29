@@ -4,12 +4,9 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.flex.POJO.ChatMessage
-import com.example.flex.POJO.Comment
-import com.example.flex.POJO.Post
-import com.example.flex.POJO.User
+import com.example.flex.POJO.*
 
-@Database(entities = [Post::class, User::class,Comment::class,ChatMessage::class], version = 4,exportSchema = false)
+@Database(entities = [Post::class, User::class,Comment::class,ChatMessage::class, Chat::class], version = 5,exportSchema = false)
 abstract class PostDatabase : RoomDatabase() {
     companion object {
         private var mInstance: PostDatabase? = null
@@ -27,4 +24,5 @@ abstract class PostDatabase : RoomDatabase() {
     abstract fun getUserDao(): UserDao
     abstract fun getCommentDao():CommentDao
     abstract fun getChatMessageDao():ChatMessageDao
+    abstract fun getChatDao():ChatDao
 }

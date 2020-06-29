@@ -12,11 +12,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val mRepository: Repository = Repository(application)
     val isMustSignIn: LiveData<Boolean?>
     var postsInFeed: LiveData<List<Post>>
+    val isRefreshFeed:LiveData<Boolean>
 
     init {
         postsInFeed= mRepository.postsInFeed
-
         isMustSignIn = mRepository.isMustSignIn
+        isRefreshFeed=mRepository.isRefreshFeed
     }
     suspend fun getUserValueFromBD(userId:Long):User{
         return mRepository.getUserValueFromDB(userId)

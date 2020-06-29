@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Chat(
     @PrimaryKey var id: Long,
     var name: String = "",
-    var users: List<User>
-) {
-}
+    var image: String = "",
+    var lastMessage:String="",
+    var lastSenderName:String=""
+)

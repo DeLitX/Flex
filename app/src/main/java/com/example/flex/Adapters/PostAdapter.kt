@@ -24,6 +24,7 @@ class PostAdapter(
     private val mOnUserClickListener: OnUserClickListener,
     private val mPostsInteraction: PostsInteraction
 ) : ListAdapter<Post, PostAdapter.PostViewHolder>(object : DiffUtil.ItemCallback<Post>() {
+
     override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem.id == newItem.id
     }
@@ -40,6 +41,9 @@ class PostAdapter(
     }
 
 }) {
+    fun getItemByPosition(position: Int):Post{
+        return getItem(position)
+    }
 
     class PostViewHolder(
         private val v: View,

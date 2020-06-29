@@ -261,6 +261,7 @@ class PostRequests(
                                 }
                             }
                             mPostRequestsInteraction.savePostsToDb(listOfPosts)
+                            mPostRequestsInteraction.setFeedRefreshState(false)
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
@@ -336,5 +337,6 @@ class PostRequests(
         fun savePostsToDb(posts: List<Post>)
         fun saveCommentsToDb(comments: List<Comment>)
         fun updatePost(post: Post)
+        fun setFeedRefreshState(value:Boolean)
     }
 }

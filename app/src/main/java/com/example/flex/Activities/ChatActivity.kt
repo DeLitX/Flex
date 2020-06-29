@@ -1,5 +1,6 @@
 package com.example.flex.Activities
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -24,31 +25,44 @@ import kotlinx.coroutines.withContext
 
 class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
     private lateinit var mViewModel: ChatViewModel
-    private lateinit var mUserName: String
+    private var mUserName: String = ""
     private var mUserId: Long = 0
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: ChatAdapter
-    private var chatId: Long = 0
+    private var mChatId: Long = 0
     private var mTempLiveData: LiveData<List<ChatMessage>>? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         loadRecycler()
         mViewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-        mViewModel.chatId.observe(this, Observer {
-            chatId = it
-            CoroutineScope(IO).launch {
-                setChatObserver(it)
-            }
-        })
-        setActionListener()
+        val chatId = intent.getLongExtra(MainData.PUT_CHAT_ID, 0)
+        val lifecycleOwner:LifecycleOwner=this
         CoroutineScope(IO).launch {
-            val intent = intent
-            mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)
-            mUserName = intent.getStringExtra(MainData.PUT_USER_NAME)
-            mViewModel.createChat(mUserId)
-            mViewModel.connectChat(mUserName)
+            if (chatId == 0.toLong()) {
+                mViewModel.chatId.observe(lifecycleOwner, Observer {
+                    mChatId = it
+                    CoroutineScope(IO).launch {
+                        setChatObserver(it)
+                    }
+                })
+                val intent = intent
+//                mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)
+//                mUserName = intent.getStringExtra(MainData.PUT_USER_NAME)
+                mViewModel.createChat(mUserId)
+                mViewModel.connectChat(mUserName)
+            } else {
+                mChatId = chatId
+                setChatObserver(chatId)
+                mViewModel.connectChat(chatId)
+            }
+
+            val user = mViewModel.getMainUser()
+            mUserName = user.name
+            mUserId = user.id
+            setActionListener()
         }
     }
 
@@ -60,6 +74,11 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
         }
         mAdapter = ChatAdapter(this)
         mRecyclerView.adapter = mAdapter
+    }
+
+    override fun onDestroy() {
+        mViewModel.closeChat()
+        super.onDestroy()
     }
 
     private fun setActionListener() {

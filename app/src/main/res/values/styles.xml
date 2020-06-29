@@ -28,6 +28,21 @@
         <item name="android:textSize">25sp</item>
         <item name="android:textColor">@color/text_black</item>
     </style>
+    <style name="Text.Black">
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="Text.Black.Huge">
+        <item name="android:textSize">@dimen/text_huge_size</item>
+    </style>
+    <style name="Text.Black.Middle">
+        <item name="android:textSize">@dimen/text_middle_size</item>
+    </style>
+    <style name="Text.Gray">
+        <item name="android:textColor">@color/colorDarkerGray</item>
+    </style>
+    <style name="Text.Gray.Mini">
+        <item name="android:textSize">@dimen/text_mini_size</item>
+    </style>
 
     <style name="TextIconSolid">
         <item name="android:textColor">@color/text_black</item>
@@ -39,7 +54,7 @@
     </style>
 
     <style name="TextHint">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/text_middle_size</item>
         <item name="android:textColor">@color/colorDarkerGray</item>
     </style>
 </resources>

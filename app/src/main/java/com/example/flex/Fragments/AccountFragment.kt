@@ -111,8 +111,8 @@ class AccountFragment : Fragment(),
         }
         mMakeChat.setOnClickListener {
             val intent = Intent(this.context, ChatActivity::class.java)
-            intent.putExtra(MainData.PUT_USER_NAME, mUser?.name)
-            intent.putExtra(MainData.PUT_USER_ID, mUser?.id)
+//            intent.putExtra(MainData.PUT_USER_NAME, mUser?.name)
+//            intent.putExtra(MainData.PUT_USER_ID, mUser?.id)
             startActivity(intent)
         }
         mSwitchTab = v.findViewById(R.id.switchRecyclers)
