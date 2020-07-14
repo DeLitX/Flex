@@ -16,4 +16,8 @@ interface ChatMessageDao {
     fun getMessagesFromChat(chatId:Long):LiveData<List<ChatMessage>>
     @Query("delete from chat_message_table where belongsToChat=:chatId")
     fun deleteAllFromChat(chatId:Long)
+    @Query("select * from chat_message_table where belongsToChat=:chatId and timeSent=(select max(timeSent) from chat_message_table where belongsToChat=:chatId)")
+    fun getLastMessageFromChat(chatId: Long):LiveData<ChatMessage>
+    @Query("delete from chat_message_table")
+    fun deleteAll()
 }

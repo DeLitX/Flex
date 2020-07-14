@@ -26,16 +26,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainUserAccountFragment : Fragment(),
-    AccountPostTableRecyclerFragment.UserUpdates {
+    AccountPostGridRecyclerFragment.UserUpdates {
     private lateinit var mActivity: AppCompatActivity
     lateinit var avatar: ImageView
     private lateinit var mFollowingCount: TextView
     private lateinit var mFollowersCount: TextView
     var mUser: User? = null
     private lateinit var v: View
-    private lateinit var mTableRecyclerView: AccountPostTableRecyclerFragment
+    private lateinit var mGridRecyclerView: AccountPostGridRecyclerFragment
     private lateinit var mListRecyclerView: AccountPostListRecyclerFragment
-    private lateinit var mCurrentRecycler: Fragment
     private lateinit var mSwitchTab: TabLayout
     private lateinit var mViewPager: ViewPager
     private lateinit var mLiveAccountUser: LiveData<User>
@@ -91,7 +90,7 @@ class MainUserAccountFragment : Fragment(),
         avatar = v.findViewById(R.id.user_icon_main)
         mFollowingCount = v.findViewById(R.id.followed_count)
         mFollowersCount = v.findViewById(R.id.followers_count)
-        mTableRecyclerView = AccountPostTableRecyclerFragment(mUser, this)
+        mGridRecyclerView = AccountPostGridRecyclerFragment(mUser, this)
         mListRecyclerView = AccountPostListRecyclerFragment(mUser)
         avatar.setOnClickListener {
             val intent = Intent(
@@ -108,7 +107,7 @@ class MainUserAccountFragment : Fragment(),
         mSwitchTab = v.findViewById(R.id.switchRecyclers)
         mViewPager = v.findViewById(R.id.recycler_fragment)
         val viewPagerAdapter = fragmentManager?.let { ViewPagerAdapter(it) }
-        viewPagerAdapter!!.addFragment(mTableRecyclerView, "Grid")
+        viewPagerAdapter!!.addFragment(mGridRecyclerView, "Grid")
         viewPagerAdapter.addFragment(mListRecyclerView, "List")
         mViewPager.adapter = viewPagerAdapter
         mSwitchTab.setupWithViewPager(mViewPager)

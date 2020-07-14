@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -27,8 +28,8 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
     lateinit var postAdapter: PostAdapter
     private lateinit var mViewModel: HomeViewModel
     private lateinit var mRefreshLayout: SwipeRefreshLayout
-    private var isPostsRefreshing: Boolean = false
-    private var currentPostPosition: Long = 0
+    private var mIsPostsRefreshing: Boolean = false
+    private var mCurrentPostPosition: Long = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +40,12 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
         mViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         mViewModel.postsInFeed.observe(viewLifecycleOwner, Observer {
             setPosts(it)
+            v.findViewById<TextView>(R.id.text_if_no_posts).text =
+                if (it.isEmpty()) {
+                    resources.getString(R.string.no_posts)
+                } else {
+                    ""
+                }
         })
         mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -62,7 +69,7 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
             if (!it) {
                 mRefreshLayout.isRefreshing = it
             }
-            isPostsRefreshing = it
+            mIsPostsRefreshing = it
         })
         v.findViewById<ImageView>(R.id.chatroom_button).setOnClickListener {
             mHomeInteraction.goToChatroom()
@@ -70,7 +77,7 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
     }
 
     private fun refreshPosts(idOfLast: Long) {
-        if (!isPostsRefreshing) {
+        if (!mIsPostsRefreshing) {
             mViewModel.refreshPosts(idOfLast)
         }
     }
@@ -88,9 +95,9 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
         recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                currentPostPosition += dy
+                mCurrentPostPosition += dy
                 if (recyclerView.adapter != null) {
-                    if (recyclerView.adapter!!.itemCount.toLong() - currentPostPosition < 3) {
+                    if (recyclerView.adapter!!.itemCount.toLong() - mCurrentPostPosition < 3) {
                         refreshPosts(postAdapter.getItemByPosition(postAdapter.itemCount - 1).id)
                     }
                 }

@@ -12,17 +12,17 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.flex.Adapters.SearchAdapter
+import com.example.flex.Adapters.UsersAdapter
 import com.example.flex.MainData
 import com.example.flex.POJO.User
 import com.example.flex.R
 import com.example.flex.SearchViewModel
 import com.example.flex.Activities.SignIn
 
-class SearchRecyclerFragment : Fragment(), SearchAdapter.OnUserClickListener {
+class SearchRecyclerFragment : Fragment(), UsersAdapter.OnUserClickListener {
 
     private lateinit var mRecycler: RecyclerView
-    private lateinit var mSearchAdapter: SearchAdapter
+    private val mSearchAdapter: UsersAdapter= UsersAdapter(this)
     private lateinit var v: View
     private lateinit var mViewModel: SearchViewModel
     private lateinit var mUpdateBar:ProgressBar
@@ -61,7 +61,6 @@ class SearchRecyclerFragment : Fragment(), SearchAdapter.OnUserClickListener {
     private fun loadRecyclerView() {
         mRecycler = v.findViewById(R.id.recycler_search)
         mRecycler.layoutManager = LinearLayoutManager(v.context)
-        mSearchAdapter = SearchAdapter(this)
         mRecycler.adapter = mSearchAdapter
     }
 

@@ -1,18 +1,22 @@
 package com.example.flex
 
 import android.app.Application
+import android.widget.ImageView
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.flex.POJO.ChatMessage
 import com.example.flex.POJO.User
+import java.io.File
 
 class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
     private val mRepository: Repository = Repository(app)
     val chatId: MutableLiveData<Long>
+    val chatCreating:LiveData<Boolean>
 
     init {
         chatId = mRepository.chatId
+        chatCreating=mRepository.chatCreating
     }
 
     suspend fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
@@ -38,6 +42,12 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
     fun createChat(userId: Long) {
         mRepository.createChat(userId)
     }
+    fun createChat(users:MutableList<Long>,chatName:String,chatPhoto: File){
+        mRepository.createChat(users,chatName,chatPhoto)
+    }
+    fun createChat(users:MutableList<Long>,chatName:String){
+        mRepository.createChat(users,chatName)
+    }
 
     fun connectChat(chatId: Long) {
         mRepository.connectToChat(chatId)
@@ -48,5 +58,11 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
     }
     fun closeChat(){
         mRepository.closeChat()
+    }
+    fun downloadPhotoByUrl(url:String,photoView:ImageView){
+        mRepository.downloadPhoto(url,photoView)
+    }
+    fun loadMessages(chatId:Long,idOfLast:Long=0){
+        mRepository.loadMessages(chatId,idOfLast)
     }
 }

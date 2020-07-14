@@ -41,6 +41,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
     val isSearchUpdating: MutableLiveData<Boolean>
     val isRegisterUpdating: MutableLiveData<Boolean>
     val isLoginUpdating: MutableLiveData<Boolean>
+    val followersList: LiveData<List<User>>
+    val isRegistSucceed: MutableLiveData<Boolean?>
+    val isFollowersAvailable: MutableLiveData<Boolean?>
+    val chatCreating:MutableLiveData<Boolean>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -63,14 +67,50 @@ class Repository(private val application: Application) : UserRequests.UserReques
         isSearchUpdating = MutableLiveData(false)
         isRegisterUpdating = MutableLiveData(false)
         isLoginUpdating = MutableLiveData(false)
+        followersList = mUserDao.getFollowingUsers()
+        isRegistSucceed = MutableLiveData(null)
+        isFollowersAvailable = MutableLiveData(null)
+        chatCreating= MutableLiveData(false)
+    }
+
+    fun deleteAllUserData() {
+        setCSRFToken("")
+        setSessionId("")
+        setYourId(0)
+        clearDatabase()
+    }
+
+    fun clearDatabase() {
+        mChatMessageDao.deleteAll()
+        mChatDao.deleteAllChats()
+        mUserDao.deleteAll()
+        mCommentDao.deleteAll()
+        postDao.deleteAllPosts()
     }
 
     fun createChat(userId: Long) {
         mChatWebsocket.createChat(userId)
     }
+    fun createChat(users: MutableList<Long>, chatName: String) {
+        CoroutineScope(IO).launch {
+            users.add(getYourId())
+            makeChatRequest().createGroupChat(users, chatName)
+        }
+    }
+    fun createChat(users: MutableList<Long>, chatName: String, chatPhoto: File) {
+        CoroutineScope(IO).launch {
+            users.add(getYourId())
+            makeChatRequest().createGroupChat(users, chatName, chatPhoto)
+        }
+    }
 
     suspend fun getUserValueFromDB(userId: Long): User {
         return mUserDao.getUserValue(userId)
+    }
+
+    fun refreshFollowersList() {
+        val request = makeUserRequests()
+        request.viewFollowing()
     }
 
     fun sendMessage(text: String, user: User) {
@@ -89,6 +129,11 @@ class Repository(private val application: Application) : UserRequests.UserReques
                 message
             )
         }
+    }
+
+    fun loadMessages(chatId: Long, idOfLast: Long) {
+        val request = makeChatRequest()
+        request.loadMessages(chatId, idOfLast, getYourId())
     }
 
     fun refreshCommentsForPost(postId: Long) {
@@ -536,13 +581,13 @@ class Repository(private val application: Application) : UserRequests.UserReques
     private fun getCSRFToken(): String {
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sharedPreferences.getString(MainData.CRSFTOKEN, "")
+        return sharedPreferences.getString(MainData.CRSFTOKEN, "") ?: ""
     }
 
     private fun getSessionId(): String {
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sharedPreferences.getString(MainData.SESSION_ID, "")
+        return sharedPreferences.getString(MainData.SESSION_ID, "") ?: ""
     }
 
     private fun getCSRFTokenAndSessionId(): Pair<String, String> {
@@ -550,7 +595,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val sessionId = sharedPreferences.getString(MainData.SESSION_ID, "")
         val csrftoken = sharedPreferences.getString(MainData.CRSFTOKEN, "")
-        return Pair(csrftoken, sessionId)
+        return Pair(csrftoken ?: "", sessionId ?: "")
     }
 
     private fun getYourId(): Long {
@@ -612,6 +657,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
         mUserDao.insert(user)
     }
 
+    override fun saveUsersToDB(users: List<User>) {
+        mUserDao.insert(users)
+    }
+
     override fun receiveMessage(message: ChatMessage) {
         mChatMessageDao.insert(message)
     }
@@ -630,9 +679,34 @@ class Repository(private val application: Application) : UserRequests.UserReques
         this.chatId.postValue(chatId)
     }
 
-    override fun saveChatsToDB(chats: List<Chat>) {
-        mChatDao.insert(chats)
+    override fun setChatAvatar(chatId: Long, avatarLink: String) {
+        val chat = mChatDao.getChat(chatId)
+        chat.image = avatarLink
+        mChatDao.insert(
+            chat
+        )
     }
+
+    override fun saveChatsToDB(chats: List<Chat>) {
+        mChatDao.deleteAndInsert(chats)
+    }
+
+    override fun saveMessagesToDB(messages: List<ChatMessage>) {
+        mChatMessageDao.insert(messages)
+    }
+
+    override fun deleteMessagesFromChat(chatId: Long) {
+        mChatMessageDao.deleteAllFromChat(chatId)
+    }
+
+    override suspend fun uploadPhoto(file: File): Pair<String, String> {
+        return makeUploadFileRequests().uploadPost(file)
+    }
+
+    override fun setChatCreating(value: Boolean) {
+        chatCreating.postValue(value)
+    }
+
 
     override fun setSearchUpdating(value: Boolean) {
         isSearchUpdating.postValue(value)
@@ -640,6 +714,9 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun setMustSignIn(value: Boolean) {
         isMustSignIn.postValue(value)
+        if (value) {
+            deleteAllUserData()
+        }
     }
 
     override fun setLoginUpdating(value: Boolean) {
@@ -648,5 +725,13 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun setRegisterUpdating(value: Boolean) {
         isRegisterUpdating.postValue(value)
+    }
+
+    override fun setRegistSucceed(value: Boolean?) {
+        isRegistSucceed.postValue(value)
+    }
+
+    override fun addUserToDB(user: User) {
+        mUserDao.insert(user)
     }
 }

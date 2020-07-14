@@ -59,4 +59,8 @@ object MainData {
     val CREATE_CHAT="create_chat"
     val GROUP_CHAT="group_chat"
     val PUT_CHAT_ID="put chat id"
+    val VIEW_SUBSCRIBES="view_subscribes"
+    val DOWNLOAD_MESSAGES="upload_messages"
+    val PUT_IDS_LIST="id's list"
+    val CREATE_GROUP_CHAT="create_group_chat"
 }

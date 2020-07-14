@@ -10,16 +10,16 @@ import com.example.flex.POJO.User
 import com.example.flex.R
 import com.squareup.picasso.Picasso
 
-class SearchAdapter(private var onUserClickListener: OnUserClickListener) :
-    RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
-    private var searchList = mutableListOf<User>()
+open class UsersAdapter(private var onUserClickListener: OnUserClickListener) :
+    RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
+    var searchList = mutableListOf<User>()
 
-    class SearchViewHolder(
+    open class UsersViewHolder(
         private val v: View,
         private val onUserClickListener: OnUserClickListener
     ) : RecyclerView.ViewHolder(v), View.OnClickListener {
-        private val userIcon: ImageView = v.findViewById(R.id.search_user_icon)
-        private val username: TextView = v.findViewById(R.id.search_username)
+        val userIcon: ImageView = v.findViewById(R.id.search_user_icon)
+        val mUsername: TextView = v.findViewById(R.id.search_username)
         lateinit var currentUser: User
 
         init {
@@ -28,7 +28,7 @@ class SearchAdapter(private var onUserClickListener: OnUserClickListener) :
 
         fun bind(user: User) {
             currentUser = user
-            username.text = user.name
+            mUsername.text = user.name
             if (user.imageUrl != "") Picasso.get().load(user.imageUrl).into(userIcon)
             else userIcon.setImageResource(R.drawable.ic_launcher_background)
         }
@@ -62,17 +62,17 @@ class SearchAdapter(private var onUserClickListener: OnUserClickListener) :
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view: View = inflater.inflate(R.layout.search_user, parent, false)
-        return SearchViewHolder(view, onUserClickListener)
+        return UsersViewHolder(view, onUserClickListener)
     }
 
     override fun getItemCount(): Int {
         return searchList.size
     }
 
-    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
         holder.bind(searchList[position])
     }
 }

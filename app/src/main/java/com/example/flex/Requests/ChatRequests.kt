@@ -2,16 +2,19 @@ package com.example.flex.Requests
 
 import com.example.flex.MainData
 import com.example.flex.POJO.Chat
-import com.example.flex.POJO.Post
+import com.example.flex.POJO.ChatMessage
+import com.example.flex.POJO.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 import java.net.CookieManager
 import java.net.CookiePolicy
+import java.time.chrono.IsoChronology
 
 class ChatRequests(
     private val mChatroomInteraction: ChatroomInteraction,
@@ -26,6 +29,107 @@ class ChatRequests(
         client = OkHttpClient.Builder()
             .cookieJar(JavaNetCookieJar(cookieManager))
             .build()
+    }
+
+    fun loadMessages(chatId: Long, idOfLast: Long, myUserId: Long) {
+        val formBody = FormBody.Builder()
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .add("chat_id", chatId.toString())
+            .add("last-id", idOfLast.toString())
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.DOWNLOAD_MESSAGES}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val body = response.body?.string()
+                    if (body != null) {
+                        CoroutineScope(IO).launch {
+                            val jsonObject = JSONObject(body)
+                            val jsonArray = jsonObject["msg_information"]
+                            if (jsonArray is JSONArray) {
+                                val chats = mutableListOf<ChatMessage>()
+                                val length = jsonArray.length()
+                                for (i in 0 until length) {
+                                    val value = jsonArray[i]
+                                    if (value is JSONObject)
+                                        chats.add(
+                                            ChatMessage(
+                                                belongsToChat = chatId,
+                                                text = value["text"].toString(),
+                                                timeSent = value["time"].toString().toLong(),
+                                                userName = value["user_name"].toString(),
+                                                userImgLink = value["user_avatar"].toString(),
+                                                userId = value["user_id"].toString().toLong(),
+                                                id = value["msg_id"].toString().toLong(),
+                                                isMy = value["user_id"].toString()
+                                                    .toLong() == myUserId
+                                            )
+                                        )
+                                }
+                                if (idOfLast == 0.toLong()) {
+                                    mChatroomInteraction.deleteMessagesFromChat(chatId)
+                                }
+                                mChatroomInteraction.saveMessagesToDB(chats)
+                            }
+                        }
+                    }
+                }
+            }
+
+        })
+    }
+
+    suspend fun createGroupChat(users: List<Long>, groupName: String, chatPhoto: File? = null) {
+        mChatroomInteraction.setChatCreating(true)
+        val linkToAvatar =
+            if (chatPhoto != null) mChatroomInteraction.uploadPhoto(chatPhoto) else Pair("", "")
+        val formBody = FormBody.Builder()
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .add("group_name", groupName)
+            .add("members_count", users.size.toString())
+            .add("members_id", usersListToJsonIdList(users))
+            .add("ava_src", linkToAvatar.first)
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CREATE_GROUP_CHAT}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string()
+                if (body != null) {
+                    mChatroomInteraction.saveChatsToDB(
+                        listOf(
+                            Chat(
+                                id = body.toLong(),
+                                name = groupName,
+                                image = linkToAvatar.first,
+                                imageMini = linkToAvatar.second
+                            )
+                        )
+                    )
+                }
+            } else {
+
+            }
+        } catch (e: IOException) {
+
+        }
+        mChatroomInteraction.setChatCreating(false)
     }
 
     fun getChats() {
@@ -49,11 +153,11 @@ class ChatRequests(
                     val body = response.body?.string()
                     if (body != null) {
                         CoroutineScope(IO).launch {
-                            val jsonObject = JSONArray(body)
+                            val jsonArray = JSONArray(body)
                             val chats = mutableListOf<Chat>()
-                            val length = jsonObject.length()
+                            val length = jsonArray.length()
                             for (i in 0 until length) {
-                                val value = jsonObject[i]
+                                val value = jsonArray[i]
                                 if (value is JSONObject)
                                     chats.add(
                                         Chat(
@@ -65,7 +169,6 @@ class ChatRequests(
                                         )
                                     )
                             }
-
                             mChatroomInteraction.saveChatsToDB(chats)
                         }
                     }
@@ -75,7 +178,25 @@ class ChatRequests(
         })
     }
 
+    private fun usersListToJsonIdList(users: List<Long>): String {
+        var result = ""
+        var isFirst: Boolean = true
+        for (i in users) {
+            if (!isFirst) {
+                result += " "
+            } else {
+                isFirst = false
+            }
+            result += i
+        }
+        return result
+    }
+
     interface ChatroomInteraction {
         fun saveChatsToDB(chats: List<Chat>)
+        fun saveMessagesToDB(messages: List<ChatMessage>)
+        fun deleteMessagesFromChat(chatId: Long)
+        suspend fun uploadPhoto(file: File): Pair<String, String>
+        fun setChatCreating(value: Boolean)
     }
 }

@@ -13,7 +13,9 @@ interface CommentDao {
     @Delete
     fun delete(comment: Comment)
     @Delete
-    fun deleteAll(comments:List<Comment>)
+    fun delete(comments:List<Comment>)
+    @Query("delete from comment_database")
+    fun deleteAll()
     @Query("select * from comment_database where belongs_to_post=:postId order by id desc")
     fun getCommentsFromPost(postId:Long):LiveData<List<Comment>>
 }

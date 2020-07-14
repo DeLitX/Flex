@@ -40,6 +40,45 @@ class UploadFileRequests(
         }
     }
 
+    suspend fun uploadPost(file: File): Pair<String, String> {
+        val formBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart(
+                "img",
+                file.name,
+                RequestBody.create("image/jpg".toMediaTypeOrNull(), file)
+            )
+            .addFormDataPart("csrfmiddlewaretoken", mCsrftoken)
+            //.addFormDataPart("description", description)
+            .build()
+        val request = Request.Builder()
+            .tag(MainData.TAG_UPLOAD)
+            .url("https://${MainData.BASE_URL}/${MainData.URL_PREFIX_USER_PROFILE}/${MainData.SEND_IMAGE}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = mClient.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                val a:String?=response.body!!.string()
+                if(a != null){
+                    val jsonObject=JSONObject(a)
+                    val link=jsonObject["src"].toString()
+                    val linkMini=jsonObject["src_mini"].toString()
+                    return Pair(link,linkMini)
+                }else{
+                    return Pair("","")
+                }
+            } else {
+                return Pair("", "")
+            }
+        } catch (e: IOException) {
+            return Pair("", "")
+        }
+    }
+
     fun uploadPostRequest(file: File, description: String) {
         val formBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
@@ -59,7 +98,7 @@ class UploadFileRequests(
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
         val call = mClient.newCall(request)
-        Log.d("timeSending","${Calendar.getInstance().timeInMillis}")
+        Log.d("timeSending", "${Calendar.getInstance().timeInMillis}")
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -68,8 +107,8 @@ class UploadFileRequests(
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    Log.d("timeSent","${Calendar.getInstance().timeInMillis}")
-                    val time= Calendar.getInstance().timeInMillis
+                    Log.d("timeSent", "${Calendar.getInstance().timeInMillis}")
+                    val time = Calendar.getInstance().timeInMillis
                     val isLogined = response.header("isLogin", "true")
                     if (isLogined == "true") {
                         val post = response.body?.string()
@@ -108,7 +147,7 @@ class UploadFileRequests(
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
         val call = mClient.newCall(request)
-        Log.d("timeSending","${Calendar.getInstance().timeInMillis}")
+        Log.d("timeSending", "${Calendar.getInstance().timeInMillis}")
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -117,7 +156,7 @@ class UploadFileRequests(
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    Log.d("timeSent","${Calendar.getInstance().timeInMillis}")
+                    Log.d("timeSent", "${Calendar.getInstance().timeInMillis}")
                     val isLogined = response.header("isLogin", "true")
                     if (isLogined == "true") {
                         val post = response.body?.string()

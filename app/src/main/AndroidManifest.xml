@@ -7,15 +7,19 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/flex_icon"
+        android:roundIcon="@mipmap/flex_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.ChatActivity"></activity>
+        <activity android:name=".Activities.CompleteCreateChat"></activity>
+        <activity android:name=".Activities.CreateChat" />
+        <activity android:name=".Activities.ChatActivity" />
 
         <uses-library
             android:name="android.test.runner"
@@ -86,6 +90,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
         <service
             android:name=".FlexFirebaseMessagingService"
             android:stopWithTask="false">

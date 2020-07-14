@@ -6,7 +6,9 @@
     <SearchView
         android:id="@+id/search_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:queryHint="Search for users"
+        />
     <FrameLayout
         android:id="@+id/tv_fragment_container"
         android:layout_width="match_parent"

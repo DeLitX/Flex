@@ -41,6 +41,8 @@ class SignIn : AppCompatActivity() {
     private fun setActionListener() {
         val signInButton = findViewById<Button>(R.id.sign_in_button)
         mUpdateBar = findViewById(R.id.login_update_circle)
+        mLogin = findViewById(R.id.login)
+        mPassword = findViewById(R.id.password)
         mViewModel.isLoginUpdating.observe(this, Observer {
             mUpdateBar.visibility = if (it) {
                 View.VISIBLE
@@ -49,9 +51,9 @@ class SignIn : AppCompatActivity() {
             }
             mUpdateBar.isIndeterminate = it
             signInButton.isEnabled = !it
+            mLogin.isEnabled=!it
+            mPassword.isEnabled=!it
         })
-        mLogin = findViewById(R.id.login)
-        mPassword = findViewById(R.id.password)
         val dontAcc = findViewById<TextView>(R.id.dont_acc)
         dontAcc.setOnClickListener {
             val intent = Intent(this, Registration().javaClass)

@@ -37,7 +37,7 @@ class TvFragment : Fragment(), SearchView.OnQueryTextListener {
         }
         search.setOnQueryTextFocusChangeListener { v, hasFocus ->
             if(hasFocus){
-                fragmentManager!!.beginTransaction().replace(R.id.tv_fragment_container,searchFragment).commit()
+                fragmentManager!!.beginTransaction().replace(R.id.tv_fragment_container,searchFragment).addToBackStack(null).commit()
             }
         }
     }

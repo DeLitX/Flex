@@ -59,7 +59,9 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
                 withContext(Main) {
                     userName.text = user?.name
                     user?.imageUrl?.let {
-                        Picasso.get().load(it).into(userAvatar)
+                        if (it != "") {
+                            mChatInteraction.downloadPhotoByUrl(it,userAvatar)
+                        }
                     }
                 }
             }
@@ -91,7 +93,12 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
         holder.bind(getItem(position))
     }
 
+    fun getItemByPosition(position: Int): ChatMessage {
+        return getItem(position)
+    }
+
     interface ChatInteraction {
+        fun downloadPhotoByUrl(url:String,photoView:ImageView)
         suspend fun getUserById(id: Long): User
     }
 }

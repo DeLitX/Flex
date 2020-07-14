@@ -3,6 +3,7 @@ package com.example.flex.Requests
 import android.os.Handler
 import android.os.Looper
 import com.example.flex.MainData
+import com.example.flex.POJO.User
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -85,6 +86,10 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         mRegistRequestInteraction.setYourId(body.toLong())
                         mRegistRequestInteraction.setMustSignIn(false)
                         mRegistRequestInteraction.setLoginUpdating(false)
+                        mRegistRequestInteraction.addUserToDB(User(
+                            id=body.toLong(),
+                            name = login
+                        ))
                     }
                 } else {
                     mRegistRequestInteraction.setLoginUpdating(false)
@@ -117,9 +122,6 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                 if (response.isSuccessful) {
                     CoroutineScope(IO).launch {
                         cookies = cookieManager.cookieStore.cookies
-                        mRegistRequestInteraction.setCSRFToken("")
-                        mRegistRequestInteraction.setSessionId("")
-                        mRegistRequestInteraction.setYourId(0)
                         mRegistRequestInteraction.setMustSignIn(true)
                     }
                 } else {
@@ -190,8 +192,10 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         /*repository.setCSRFToken(cookies[0].value)
                         repository.setSessionId(cookies[1].value)*/
                         mRegistRequestInteraction.setRegisterUpdating(false)
+                        mRegistRequestInteraction.setRegistSucceed(true)
                     }
                 } else {
+                    mRegistRequestInteraction.setRegistSucceed(false)
                     mRegistRequestInteraction.setRegisterUpdating(false)
                 }
             }
@@ -205,5 +209,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         fun setMustSignIn(value:Boolean)
         fun setLoginUpdating(value:Boolean)
         fun setRegisterUpdating(value:Boolean)
+        fun setRegistSucceed(value:Boolean?)
+        fun addUserToDB(user: User)
     }
 }

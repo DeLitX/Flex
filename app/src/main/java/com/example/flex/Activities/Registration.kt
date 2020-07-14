@@ -17,6 +17,7 @@ class Registration : AppCompatActivity() {
     private lateinit var mRepeatPassword: EditText
     private lateinit var mViewModel: AccountViewModel
     private lateinit var mUpdateBar: ProgressBar
+    private lateinit var mTextBelowRegistration:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +40,7 @@ class Registration : AppCompatActivity() {
         mPassword = findViewById(R.id.password)
         mRepeatPassword = findViewById(R.id.repeat_password)
         mUpdateBar = findViewById(R.id.register_update_circle)
+        mTextBelowRegistration=findViewById(R.id.text_below_registration)
         val signUp = findViewById<Button>(R.id.sign_up_button)
         val haveAcc = findViewById<TextView>(R.id.have_acc)
         mViewModel.isRegisterUpdating.observe(this, Observer {
@@ -49,6 +51,19 @@ class Registration : AppCompatActivity() {
             }
             signUp.isEnabled = !it
             mUpdateBar.isIndeterminate = it
+            mEmail.isEnabled=!it
+            mLogin.isEnabled=!it
+            mPassword.isEnabled=!it
+            mRepeatPassword.isEnabled=!it
+        })
+        mViewModel.isRegistSucceed.observe(this, Observer {
+            if(it==false){
+                mTextBelowRegistration.text="Something went wrong.Please,try again."
+            }else if(it==true){
+                   mTextBelowRegistration.text= "We sent a letter on your Email.Please follow the link and then sign in"
+            }else{
+                mTextBelowRegistration.text=""
+            }
         })
         haveAcc.setOnClickListener {
             val intent = Intent(this, SignIn().javaClass)
@@ -64,13 +79,14 @@ class Registration : AppCompatActivity() {
                     login = mLogin.text.toString(),
                     password = mPassword.text.toString()
                 )
-                Toast.makeText(
-                    this,
-                    "We sent a letter on your Email.Please follow the link and then sign in",
-                    Toast.LENGTH_LONG
-                ).show()
-            } else
-                Toast.makeText(this, "try again", Toast.LENGTH_LONG).show()
+
+            }else if(mPassword.text.toString().trim() != mRepeatPassword.text.toString().trim()){
+                mTextBelowRegistration.text= "Passwords are not identical"
+            }else if(mLogin.text.toString().trim() == ""){
+                mTextBelowRegistration.text="Nickname mustn't be empty"
+            }else{
+                mTextBelowRegistration.text="Email must finish by @gmail.com"
+            }
         }
     }
 }

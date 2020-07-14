@@ -9,6 +9,7 @@ data class ChatMessage(
     var text: String = "",
     var timeSent: Long = 0,
     var userId: Long = 0,
+    var id:Long=0,
     @Ignore
     var user: User = User(userId),
     var userImgLink: String = "",

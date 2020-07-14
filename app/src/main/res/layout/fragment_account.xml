@@ -95,6 +95,7 @@
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
+        style="@style/Base.Widget.Design.TabLayout.Custom"
         android:id="@+id/switchRecyclers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

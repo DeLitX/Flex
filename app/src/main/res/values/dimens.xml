@@ -6,4 +6,6 @@
     <dimen name="text_middle_size">25sp</dimen>
     <dimen name="text_huge_size">40sp</dimen>
     <dimen name="margin_border">18dp</dimen>
+    <dimen name="margin_border_a_little">8dp</dimen>
+    <dimen name="corner_radius">16dp</dimen>
 </resources>

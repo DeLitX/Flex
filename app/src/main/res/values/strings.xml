@@ -6,7 +6,6 @@
     <string name="email">E-mail</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_in">Sign in</string>
-    <string name="login_or_email">Login/E-mail</string>
     <string name="more_menu_icon">\uf142</string>
     <string name="comment_icon">\uf27a</string>
     <string name="fire_icon">\uf06d</string>
@@ -35,6 +34,10 @@
     <string name="make_post">Make post</string>
     <string name="write_message">Write your message</string>
     <string name="chat">Chat</string>
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_posts">There are no posts yet.Subscribe some accounts to see their posts</string>
+    <string name="no_chats">There are no chats yet.Start chat with someone and it will appear here</string>
+    <string name="enter_chat_name">Enter chat name</string>
+    <string name="take_photo">Take photo</string>
+    <string name="get_from_gallery">Get photo from gallery</string>
+    <string name="add_photo">Add photo</string>
 </resources>

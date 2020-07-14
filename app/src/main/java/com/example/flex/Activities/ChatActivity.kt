@@ -1,10 +1,10 @@
 package com.example.flex.Activities
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -31,6 +31,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
     private lateinit var mAdapter: ChatAdapter
     private var mChatId: Long = 0
     private var mTempLiveData: LiveData<List<ChatMessage>>? = null
+    private var mCurrentMessagePosition: Long = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +56,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
                 mViewModel.connectChat(mUserName)
             }
         } else {
+            val context = this.applicationContext
             CoroutineScope(IO).launch {
                 mChatId = chatId
                 setChatObserver(chatId)
@@ -62,6 +64,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
                 val user = mViewModel.getMainUser()
                 mUserName = user.name
                 mUserId = user.id
+                mViewModel.loadMessages(mChatId, 0)
             }
         }
         setActionListener()
@@ -75,6 +78,22 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
         }
         mAdapter = ChatAdapter(this)
         mRecyclerView.adapter = mAdapter
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                mCurrentMessagePosition += dy
+                if (recyclerView.adapter != null) {
+                    if (mAdapter.itemCount >= 30) {
+                        if (recyclerView.adapter!!.itemCount.toLong() - mCurrentMessagePosition < 10) {
+                            mViewModel.loadMessages(
+                                mChatId,
+                                mAdapter.getItemByPosition(mAdapter.itemCount - 1).id
+                            )
+                        }
+                    }
+                }
+            }
+        })
     }
 
     override fun onDestroy() {
@@ -114,7 +133,12 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction {
         mRecyclerView.smoothScrollToPosition(0)
     }
 
+    override fun downloadPhotoByUrl(url: String, photoView: ImageView) {
+        mViewModel.downloadPhotoByUrl(url, photoView)
+    }
+
     override suspend fun getUserById(id: Long): User {
         return mViewModel.getUserById(id)
     }
+
 }

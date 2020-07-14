@@ -10,7 +10,7 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(user: User)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(users:List<User>)
+    fun insert(users:List<User>)
     @Delete
     fun delete(user: User)
     @Delete
@@ -29,4 +29,6 @@ interface UserDao {
     fun searchUsers(query:String):List<User>
     @Query("select id from user_database where is_Subscribed=1")
     fun getIdOfFollowingUsers():List<Long>
+    @Query("select * from user_database where is_Subscribed=1")
+    fun getFollowingUsers():LiveData<List<User>>
 }

@@ -30,14 +30,7 @@ class CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         v = inflater.inflate(R.layout.fragment_photo, container, false)
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermissions(
-                arrayOf(
-                    android.Manifest.permission.CAMERA,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ), 201
-            )
-        }
+
         mViewModel = ViewModelProviders.of(this).get(AccountViewModel::class.java)
         mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -51,10 +44,7 @@ class CameraFragment : Fragment() {
     }
 
     fun addActionListener() {
-        val btnRegistration = v.findViewById<Button>(R.id.button_registration)
-        val btnLogIn = v.findViewById<Button>(R.id.button_login)
         val btnLogout = v.findViewById<Button>(R.id.button_logout)
-        val btnCheckLog = v.findViewById<Button>(R.id.button_checkLog)
         val changePassBtn = v.findViewById<Button>(R.id.button_change_pass)
         val makePostBtn = v.findViewById<Button>(R.id.button_make_post)
         makePostBtn.setOnClickListener {
@@ -73,22 +63,11 @@ class CameraFragment : Fragment() {
                 100
             )
         }
-        btnCheckLog.setOnClickListener {
-            mViewModel.checkLog()
-        }
         btnLogout.setOnClickListener {
             mViewModel.logout()
         }
         changePassBtn.setOnClickListener {
             val intent = Intent(v.context, ForgotPass().javaClass)
-            startActivity(intent)
-        }
-        btnRegistration.setOnClickListener {
-            val intent = Intent(v.context, Registration().javaClass)
-            startActivity(intent)
-        }
-        btnLogIn.setOnClickListener {
-            val intent = Intent(v.context, SignIn().javaClass)
             startActivity(intent)
         }
 

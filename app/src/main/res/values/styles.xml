@@ -13,7 +13,10 @@
         <item name="android:layout_width">@dimen/icon_size</item>
         <item name="android:scaleType">centerCrop</item>
     </style>
-
+    <style name="Icon.VeryMini">
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">30dp</item>
+    </style>
     <style name="Icon.Mini">
         <item name="android:layout_height">60dp</item>
         <item name="android:layout_width">60dp</item>
@@ -30,6 +33,9 @@
     </style>
     <style name="Text.Black">
         <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="Text.Black.Mini">
+        <item name="android:textSize">@dimen/text_mini_size</item>
     </style>
     <style name="Text.Black.Huge">
         <item name="android:textSize">@dimen/text_huge_size</item>
@@ -56,5 +62,9 @@
     <style name="TextHint">
         <item name="android:textSize">@dimen/text_middle_size</item>
         <item name="android:textColor">@color/colorDarkerGray</item>
+    </style>
+
+    <style name="Base.Widget.Design.TabLayout.Custom">
+        <item name="tabIndicatorColor">@color/colorGrayish</item>
     </style>
 </resources>

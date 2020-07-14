@@ -26,7 +26,7 @@
         android:background="@drawable/registration_fields"
         android:ems="10"
         android:gravity="center"
-        android:hint="@string/login_or_email"
+        android:hint="@string/login"
         android:inputType="textPersonName"
         android:padding="5dp" />
 

@@ -107,6 +107,72 @@ class UserRequests(
         })
     }
 
+    fun viewFollowing() {
+        val request = Request.Builder()
+            .tag(MainData.TAG_VIEW_ACC)
+            .url("https://${MainData.BASE_URL}/${MainData.URL_PREFIX_USER_PROFILE}/${MainData.VIEW_SUBSCRIBES}")
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=${csrftoken}; sessionid=${sessionId}")
+            .build()
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    CoroutineScope(IO).launch {
+                        val body = response.body?.string()
+                        if (body != null) {
+                            val jsonObject = JSONObject(body)
+                            val jsonArray = jsonObject["response"]
+                            if (jsonArray is JSONArray) {
+                                val listOfUsers = mutableListOf<User>()
+                                val length = jsonObject.length()
+                                for (i in 0 until length) {
+                                    val value = jsonArray[i]
+                                    if (value is JSONObject) {
+                                        listOfUsers.add(
+                                            User(
+                                                id = value["id"].toString().toLong(),
+                                                name = value["username"].toString(),
+                                                imageUrl = if (value["ava_src"].toString() != "None") value["ava_src"].toString() else "",
+                                                isSubscribed = true
+                                            )
+                                        )
+                                    }
+                                }
+                                mUserRequestsInteraction.saveUsersToDB(listOfUsers)
+                            }
+
+                            /*var user: User = if (actualUser != null) {
+                                User(
+                                    id = idOfUser.toString().toLong(),
+                                    name = nameOfUser.toString(),
+                                    followingCount = actualUser.followingCount,
+                                    followersCount = actualUser.followersCount,
+                                    imageUrl = actualUser.imageUrl,
+                                    isSubscribed = isSubscribed.toString().toBoolean()
+                                )
+                            } else {
+                                User(
+                                    id = idOfUser.toString().toLong(),
+                                    isSubscribed = isSubscribed.toString().toBoolean(),
+                                    name = nameOfUser.toString()
+                                )
+                            }*/
+                        }
+                    }
+                } else if (response.code == MainData.ERR_403) {
+                    mUserRequestsInteraction.setMustSignIn(true)
+                } else {
+
+                }
+            }
+        })
+    }
+
     fun viewUserInformation(user: User) {
         val urlHttp = if (user.id == 0.toLong()) {
             HttpUrl.Builder().scheme("https")
@@ -130,7 +196,7 @@ class UserRequests(
         val call = client.newCall(request)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                if(true){
+                if (true) {
 
                 }
             }
@@ -230,10 +296,11 @@ class UserRequests(
         fun setFollowingCount(userId: Long, count: Long)
         fun setFollowersCount(userId: Long, count: Long)
         fun follow(userId: Long)
-        fun unfollow(userId:Long)
-        fun setMustSignIn(value:Boolean)
+        fun unfollow(userId: Long)
+        fun setMustSignIn(value: Boolean)
         fun savePostsToDb(posts: List<Post>, idOfUser: Long)
         fun updateUserInDb(user: User)
+        fun saveUsersToDB(users: List<User>)
     }
 
 }

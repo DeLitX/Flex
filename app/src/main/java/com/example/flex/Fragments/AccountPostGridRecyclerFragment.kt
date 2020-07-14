@@ -18,7 +18,7 @@ import com.example.flex.R
 import com.example.flex.AccountViewModel
 import com.example.flex.MainData
 
-class AccountPostTableRecyclerFragment(private var mUser: User?, private val mUpdater: UserUpdates) :
+class AccountPostGridRecyclerFragment(private var mUser: User?, private val mUpdater: UserUpdates) :
     Fragment(), PhotosAdapter.PhotosInteraction {
     lateinit var v: View
     private lateinit var recycler: RecyclerView

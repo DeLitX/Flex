@@ -78,7 +78,7 @@ class SearchRequests(
                                 users.add(User(user.value, user.key))
                             }
                             val previousList = userDao.searchUsers(query = search)
-                            userDao.insertAll(users)
+                            userDao.insert(users)
                             searchResult.postValue(users)
                             deleteOddsFromDB(previousList, users, userDao)
                             mSearchInteraction.setSearchUpdating(false)

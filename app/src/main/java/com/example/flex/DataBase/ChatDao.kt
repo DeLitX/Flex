@@ -14,6 +14,13 @@ interface ChatDao {
     fun delete(chat:Chat)
     @Query("select * from chat_table")
     fun getChats():LiveData<List<Chat>>
+    @Query("select * from chat_table where id=:chatId")
+    fun getChat(chatId:Long):Chat
     @Query("delete from chat_table")
     fun deleteAllChats()
+    @Transaction
+    fun deleteAndInsert(chats:List<Chat>){
+        deleteAllChats()
+        insert(chats)
+    }
 }
