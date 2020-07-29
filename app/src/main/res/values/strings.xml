@@ -44,6 +44,5 @@
     <string name="background">background</string>
     <string name="remove_user">remove user from chat</string>
     <string name="upgrade_user">upgrade user status</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="gps_require">This application requires GPS to work properly, do you want to enable it?</string>
 </resources>

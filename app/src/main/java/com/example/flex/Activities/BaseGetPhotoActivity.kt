@@ -76,8 +76,6 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
                 } else {
                     mCanTakePhoto = false
                 }
-            } else {
-
             }
         }
     }

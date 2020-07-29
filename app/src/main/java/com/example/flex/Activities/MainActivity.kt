@@ -3,21 +3,19 @@ package com.example.flex.Activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.flex.Fragments.*
 import com.example.flex.MainData
 import com.example.flex.POJO.User
 import com.example.flex.R
 import com.example.flex.ViewModels.AccountViewModel
-import com.example.flex.ViewModels.BaseViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -27,9 +25,10 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
     var tv = TvFragment()
     var map = MapFragment()
     var camera = CameraFragment()
-    lateinit var bnv: BottomNavigationView
+    private lateinit var mBnv: BottomNavigationView
         private set
-    lateinit var mViewModel: AccountViewModel
+    private lateinit var mViewModel: AccountViewModel
+    private lateinit var mMapIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
                 val user: User? = mViewModel.getUserValueFromDB(id)
                 if (user != null) {
                     withContext(Main) {
-                        goToUser(user,false)
+                        goToUser(user, false)
                     }
                 }
             }
@@ -65,8 +64,19 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
     }
 
     private fun setActionListener() {
-        bnv = findViewById(R.id.bottom_bar)
-        bnv.setOnNavigationItemSelectedListener { menuItem ->
+        mBnv = findViewById(R.id.bottom_bar)
+        mMapIcon = findViewById(R.id.map_icon)
+        mMapIcon.setOnClickListener {
+            val fragmentManager = supportFragmentManager.beginTransaction()
+            var isAddToBackStack = true
+            if (supportFragmentManager.findFragmentByTag("fragment_tag") == map) {
+                isAddToBackStack = false
+            }
+            fragmentManager.replace(R.id.frame_container, map, "fragment_tag")
+            if (isAddToBackStack) fragmentManager.addToBackStack(null)
+            fragmentManager.commit()
+        }
+        mBnv.setOnNavigationItemSelectedListener { menuItem ->
             //here code in case of choosing item in bottom bar
             var isAddToBackStack = true
             val selectedFragment: Fragment =
