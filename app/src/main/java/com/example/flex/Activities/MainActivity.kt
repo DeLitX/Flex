@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
         val sharedPreferences = getSharedPreferences("shared prefs", Context.MODE_PRIVATE)
         val sessionId = sharedPreferences.getString(MainData.SESSION_ID, "")
         val csrftoken = sharedPreferences.getString(MainData.CRSFTOKEN, "")
-        val id:Long = intent.getLongExtra(MainData.EXTRA_GO_TO_USER_ID, 0L)
+        val id: Long = intent.getLongExtra(MainData.EXTRA_GO_TO_USER_ID, 0L)
         if (sessionId == "" || csrftoken == "") {
             val intent = Intent(this, Registration::class.java)
             startActivity(intent)
@@ -51,12 +51,12 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_container, home, "fragment_tag")
                 .commit()
-        }else{
+        } else {
             CoroutineScope(IO).launch {
-                val user:User?=mViewModel.getUserValueFromDB(id)
-                if(user!=null){
-                    withContext(Main){
-                     goToUser(user)
+                val user: User? = mViewModel.getUserValueFromDB(id)
+                if (user != null) {
+                    withContext(Main) {
+                        goToUser(user,false)
                     }
                 }
             }
@@ -115,21 +115,28 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
         }
     }
 
-    override fun goToUser(user: User) {
+    override fun goToUser(user: User, isGoToBackStack: Boolean) {
         if (user.name != "") {
             val sharedPreferences =
                 getSharedPreferences("shared prefs", Context.MODE_PRIVATE)
             if (user.id == sharedPreferences.getLong(MainData.YOUR_ID, 0)) {
                 val fragment = MainUserAccountFragment()
                 fragment.mUser = user
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.frame_container, fragment).addToBackStack(null).commit()
+                val fragmentReplace = supportFragmentManager.beginTransaction()
+                    .replace(R.id.frame_container, fragment)
+                if (isGoToBackStack) {
+                    fragmentReplace.addToBackStack(null)
+                }
+                fragmentReplace.commit()
             } else {
                 val fragment = AccountFragment()
                 fragment.mUser = user
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.frame_container, fragment, "fragment_tag").addToBackStack(null)
-                    .commit()
+                val fragmentReplace = supportFragmentManager.beginTransaction()
+                    .replace(R.id.frame_container, fragment, "fragment_tag")
+                if (isGoToBackStack) {
+                    fragmentReplace.addToBackStack(null)
+                }
+                fragmentReplace.commit()
             }
         }
         mViewModel.setGoToUser(null)

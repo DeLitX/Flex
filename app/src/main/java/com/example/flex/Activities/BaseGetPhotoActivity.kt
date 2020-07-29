@@ -19,9 +19,9 @@ import java.util.*
 
 open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
     private lateinit var mPathToFile: String
-    private val GALLERY_REQUEST_CODE = 200
-    private val TAKE_PHOTO_REQUEST_CODE = 100
-    private val REQUEST_CAMERA_PERMISSION = 201
+    val GALLERY_REQUEST_CODE = 200
+    val TAKE_PHOTO_REQUEST_CODE = 100
+    val REQUEST_CAMERA_PERMISSION = 201
     private var mCanTakePhoto: Boolean? = null
     var mFile: File? = null
 
@@ -31,8 +31,10 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
             when (requestCode) {
                 TAKE_PHOTO_REQUEST_CODE -> {
                     val captureImage = BitmapFactory.decodeFile(mPathToFile)
-                    mFile = File(mPathToFile)
-                    onGetPhotoFromGallery(captureImage)
+                    if (captureImage != null) {
+                        mFile = File(mPathToFile)
+                        onGetPhotoFromGallery(captureImage)
+                    }
                 }
                 GALLERY_REQUEST_CODE -> {
                     if (data != null) {
@@ -71,8 +73,8 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
                 if (counter == 2) {
                     mCanTakePhoto = true
                     takePicture()
-                }else{
-                    mCanTakePhoto=false
+                } else {
+                    mCanTakePhoto = false
                 }
             } else {
 

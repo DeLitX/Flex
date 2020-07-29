@@ -21,7 +21,7 @@ class SignIn : AppCompatActivity() {
     private lateinit var mUpdateBar: ProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.login_activity)
+        setContentView(R.layout.sign_in_activity)
         mViewModel = ViewModelProvider(this).get(AccountViewModel::class.java)
         mViewModel.isMustSignIn.observe(this, Observer {
             if (it == false) {

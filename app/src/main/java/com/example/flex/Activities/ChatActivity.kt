@@ -253,6 +253,6 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
     }
 
     interface ChatInteraction {
-        fun goToUser(user: User)
+        fun goToUser(user: User,isGoToBackStack:Boolean=true)
     }
 }

@@ -2,47 +2,53 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/make_post_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.MakePostActivity">
+
     <LinearLayout
         android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-    <com.example.flex.SquareImageView
-        android:id="@+id/publish_post_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="2"/>
+
+        <com.example.flex.SquareImageView
+            android:id="@+id/publish_post_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+
         <EditText
             android:id="@+id/publish_post_text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:inputType="textMultiLine"/>
+            android:inputType="textMultiLine" />
     </LinearLayout>
+
     <Button
-        android:background="@drawable/main_app_buttons"
         android:id="@+id/button_submit_post"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linear_layout"
-        android:text="@string/publish"
-        android:visibility="gone"/>
-    <Button
         android:background="@drawable/main_app_buttons"
+        android:text="@string/publish"
+        android:visibility="gone" />
+
+    <Button
         android:id="@+id/button_get_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linear_layout"
+        android:background="@drawable/main_app_buttons"
         android:text="@string/get_picture" />
 
     <Button
-        android:background="@drawable/main_app_buttons"
         android:id="@+id/button_take_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/button_get_picture"
+        android:background="@drawable/main_app_buttons"
         android:text="@string/take_picture" />
 </RelativeLayout>
