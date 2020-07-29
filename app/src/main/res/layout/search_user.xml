@@ -5,15 +5,15 @@
     android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/search_user_icon"
+        android:id="@+id/user_icon"
         style="@style/Icon"
         android:src="@drawable/ic_launcher_background" />
 
     <TextView
-        android:id="@+id/search_username"
+        android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Text"
-        android:layout_toEndOf="@id/search_user_icon"
-        android:layout_toRightOf="@id/search_user_icon" />
+        android:layout_toEndOf="@id/user_icon"
+        android:layout_toRightOf="@id/user_icon" />
 </RelativeLayout>

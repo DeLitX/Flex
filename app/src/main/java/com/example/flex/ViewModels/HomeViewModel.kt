@@ -1,4 +1,4 @@
-package com.example.flex
+package com.example.flex.ViewModels
 
 import android.app.Application
 import android.widget.ImageView
@@ -7,16 +7,14 @@ import androidx.lifecycle.LiveData
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
+import com.example.flex.Repository
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val mRepository: Repository = Repository(application)
-    val isMustSignIn: LiveData<Boolean?>
+class HomeViewModel(application: Application) : BaseViewModel(application) {
     var postsInFeed: LiveData<List<Post>>
     val isRefreshFeed:LiveData<Boolean>
 
     init {
         postsInFeed= mRepository.postsInFeed
-        isMustSignIn = mRepository.isMustSignIn
         isRefreshFeed=mRepository.isRefreshFeed
     }
     suspend fun getUserValueFromBD(userId:Long):User{
@@ -55,7 +53,4 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         mRepository.likePost(post)
     }
 
-    fun downloadPhoto(link: String, photo: ImageView) {
-        mRepository.downloadPhoto(link, photo)
-    }
 }

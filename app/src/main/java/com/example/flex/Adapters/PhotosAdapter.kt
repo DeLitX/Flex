@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.POJO.Post
 import com.example.flex.R
@@ -15,8 +16,10 @@ class PhotosAdapter(val downloadPhoto:PhotosInteraction) : RecyclerView.Adapter<
         private val photo = v.findViewById<ImageView>(R.id.image_item)
         private lateinit var post:Post
         private var mPostPosition:Int=0
+        private val layout:ConstraintLayout=v.findViewById(R.id.layout)
 
         init {
+            layout.clipToOutline=true
             photo.setOnClickListener {
                 mPhotosInteraction.onPhotoClick(mPostPosition)
             }
@@ -25,8 +28,8 @@ class PhotosAdapter(val downloadPhoto:PhotosInteraction) : RecyclerView.Adapter<
         fun bind(image: Post,position: Int) {
             mPostPosition=position
             post=image
-            if (image.imageUrlMini != "") {
-                mPhotosInteraction.downloadPhoto(image.imageUrlMini,photo)
+            if (image.imageUrl != "") {
+                mPhotosInteraction.downloadPhoto(image.imageUrl,photo)
             }
         }
     }

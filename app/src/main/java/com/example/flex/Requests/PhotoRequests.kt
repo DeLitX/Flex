@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.flex.CacheInterceptor
 import com.example.flex.MainData
 import com.example.flex.PicassoInterceptor
+import com.example.flex.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -21,7 +22,7 @@ class PhotoRequests(
     private val isMustSignIn: MutableLiveData<Boolean?>,
     private val csrftoken: String,
     private val sessionId: String,
-    private val cache:Cache
+    private val cache: Cache
 ) {
     private val cookieManager = CookieManager()
     private val client: OkHttpClient
@@ -64,13 +65,23 @@ class PhotoRequests(
                     CoroutineScope(IO).launch {
                         val inputStream = response.body!!.byteStream()
                         val bitmap = BitmapFactory.decodeStream(inputStream)
-                        withContext(Main) {
-                            photoView.setImageBitmap(bitmap)
+                        if (bitmap != null) {
+                            withContext(Main) {
+                                photoView.setImageBitmap(bitmap)
+                            }
+                        } else {
+                            CoroutineScope(Main).launch {
+                                photoView.setImageResource(R.drawable.ic_launcher_background)
+                            }
                         }
                     }
 
                 } else if (response.code == MainData.ERR_403) {
                     isMustSignIn.postValue(true)
+                } else {
+                    CoroutineScope(Main).launch {
+                        photoView.setImageResource(R.drawable.ic_launcher_background)
+                    }
                 }
             }
         })

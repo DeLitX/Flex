@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.Adapters.ChoosableUsersAdapter
@@ -32,6 +33,7 @@ class ChoosableUsersRecyclerFragment(private val mUsersRecyclerInteraction: User
     }
 
     interface UsersRecyclerInteraction {
+        fun downloadPhoto(link:String,photoHolder:ImageView)
         fun chooseUser(user: User)
         fun unChooseUser(user: User)
     }
@@ -46,6 +48,10 @@ class ChoosableUsersRecyclerFragment(private val mUsersRecyclerInteraction: User
 
     override fun unChooseUser(user: User) {
         mUsersRecyclerInteraction.unChooseUser(user)
+    }
+
+    override fun downloadPhoto(link: String, imageHolder: ImageView) {
+        mUsersRecyclerInteraction.downloadPhoto(link,imageHolder)
     }
 
 }

@@ -6,21 +6,21 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/message_sender_avatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="@id/message_linear_layout"
+        app:layout_constraintBottom_toBottomOf="@id/message_linear_layout"/>
     <LinearLayout
+        android:id="@+id/message_linear_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/message_sender_avatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/message_sender_avatar"
-        app:layout_constraintTop_toTopOf="@id/message_sender_avatar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@id/message_sender_name"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:background="@drawable/registration_fields"
+            android:background="@drawable/rounded_corners"
             android:padding="15dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,15 +4,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.flex.Adapters.ChoosableUsersAdapter
-import com.example.flex.Adapters.MiniUserGridAdapter
-import com.example.flex.Adapters.UsersAdapter
-import com.example.flex.ChatroomViewModel
+import com.example.flex.ViewModels.ChatroomViewModel
 import com.example.flex.Fragments.ChoosableUsersRecyclerFragment
 import com.example.flex.Fragments.MiniUsersRecyclerFragment
 import com.example.flex.MainData
@@ -52,6 +47,10 @@ class CreateChat : AppCompatActivity(), ChoosableUsersRecyclerFragment.UsersRecy
 
     private fun getFollowers() {
         mViewModel.refreshFollowersList()
+    }
+
+    override fun downloadPhoto(link: String, photoHolder: ImageView) {
+        mViewModel.downloadPhoto(link,photoHolder)
     }
 
     override fun chooseUser(user: User) {

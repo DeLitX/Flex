@@ -1,5 +1,6 @@
 package com.example.flex.Adapters
 
+import android.app.ActionBar
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -60,11 +62,14 @@ class PostAdapter(
         private val commentIcon: TextView = v.findViewById(R.id.comments_icon)
         private val shareCount: TextView = v.findViewById(R.id.share_count)
         private val postText: TextView = v.findViewById(R.id.post_text)
+        private val layout:ConstraintLayout=v.findViewById(R.id.post_layout)
         private lateinit var post: Post
         private var isLiked = false
         private val mPicasso = Picasso.get()
 
         init {
+            layout.clipToOutline=true
+
             mPicasso.setIndicatorsEnabled(true)
             mainUserAvatar.setOnClickListener {
                 if (post.mainUser.id != 0.toLong()) {
@@ -115,10 +120,7 @@ class PostAdapter(
             }
             if (post.postText != "") {
                 postText.text = post.postText
-                postText.layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+                postText.layoutParams.height=ActionBar.LayoutParams.WRAP_CONTENT
             } else {
                 postText.height = 0
             }

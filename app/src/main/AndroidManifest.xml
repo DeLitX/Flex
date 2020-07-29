@@ -36,7 +36,6 @@
         <activity android:name=".Activities.MakePostActivity" />
         <activity
             android:name=".Activities.MainActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>

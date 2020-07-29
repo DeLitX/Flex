@@ -1,4 +1,4 @@
-package com.example.flex
+package com.example.flex.ViewModels
 
 import android.app.Application
 import android.widget.ImageView
@@ -8,29 +8,29 @@ import androidx.lifecycle.MutableLiveData
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
+import com.example.flex.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.io.File
 
-class AccountViewModel(private val app: Application) : AndroidViewModel(app) {
-    private val mRepository: Repository = Repository(app)
+class AccountViewModel(private val app: Application) : BaseViewModel(app) {
     val allPosts: LiveData<List<Post>>
     private val mMainUser:LiveData<User>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
-    val isMustSignIn: MutableLiveData<Boolean?>
     val isLoginUpdating:LiveData<Boolean>
     val isRegisterUpdating:LiveData<Boolean>
     val isRegistSucceed:LiveData<Boolean?>
+    val errorText:LiveData<String?>
 
     init {
         allPosts = mRepository.getAllPosts()
         mMainUser = mRepository.mainUser
         isPasswordCanBeChanged = mRepository.isPasswordCanBeChanged
-        isMustSignIn = mRepository.isMustSignIn
         isLoginUpdating=mRepository.isLoginUpdating
         isRegisterUpdating=mRepository.isRegisterUpdating
         isRegistSucceed=mRepository.isRegistSucceed
+        errorText=mRepository.errorText
     }
     suspend fun getUserValueFromDB(userId:Long):User{
         return mRepository.getUserValueFromDB(userId)
@@ -82,10 +82,6 @@ class AccountViewModel(private val app: Application) : AndroidViewModel(app) {
         mRepository.likePost(post)
     }
 
-    fun downloadPhoto(link: String, photo: ImageView) {
-        mRepository.downloadPhoto(link, photo)
-    }
-
     fun getMainUser(): LiveData<User> {
         return mMainUser
     }
@@ -124,5 +120,8 @@ class AccountViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun changePassword(email: String, newPassword: String, checkCode: String) {
         mRepository.changePassword(email, newPassword, checkCode)
+    }
+    fun testNotification(){
+        mRepository.testNotification()
     }
 }

@@ -8,33 +8,50 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.POJO.User
 import com.example.flex.R
-import com.squareup.picasso.Picasso
 
-open class UsersAdapter(private var onUserClickListener: OnUserClickListener) :
+open class UsersAdapter(
+    private val mOnUserClickListener: OnUserClickListener?,
+    private val mUsersAdapterInteraction: UsersAdapterInteraction
+) :
     RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
     var searchList = mutableListOf<User>()
+    internal var layoutId:Int=R.layout.search_user
+
+    constructor(mUsersAdapterInteraction: UsersAdapterInteraction) : this(
+        null,
+        mUsersAdapterInteraction
+    ) {
+    }
 
     open class UsersViewHolder(
         private val v: View,
-        private val onUserClickListener: OnUserClickListener
+        private val mOnUserClickListener: OnUserClickListener?,
+        private val mUsersAdapterInteraction: UsersAdapterInteraction
     ) : RecyclerView.ViewHolder(v), View.OnClickListener {
-        val userIcon: ImageView = v.findViewById(R.id.search_user_icon)
-        val mUsername: TextView = v.findViewById(R.id.search_username)
+        val userIcon: ImageView = v.findViewById(R.id.user_icon)
+        val mUsername: TextView = v.findViewById(R.id.user_name)
         lateinit var currentUser: User
+
+        constructor(v: View, mUsersAdapterInteraction: UsersAdapterInteraction) : this(
+            v,
+            null,
+            mUsersAdapterInteraction
+        ) {
+        }
 
         init {
             v.setOnClickListener(this)
         }
 
-        fun bind(user: User) {
+        open fun bind(user: User) {
             currentUser = user
             mUsername.text = user.name
-            if (user.imageUrl != "") Picasso.get().load(user.imageUrl).into(userIcon)
+            if (user.imageUrl != "") mUsersAdapterInteraction.downloadPhoto(user.imageUrl, userIcon)
             else userIcon.setImageResource(R.drawable.ic_launcher_background)
         }
 
         override fun onClick(v: View?) {
-            onUserClickListener.onUserClick(currentUser)
+            mOnUserClickListener?.onUserClick(currentUser)
         }
     }
 
@@ -64,8 +81,8 @@ open class UsersAdapter(private var onUserClickListener: OnUserClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view: View = inflater.inflate(R.layout.search_user, parent, false)
-        return UsersViewHolder(view, onUserClickListener)
+        val view: View = inflater.inflate(layoutId, parent, false)
+        return UsersViewHolder(view, mOnUserClickListener, mUsersAdapterInteraction)
     }
 
     override fun getItemCount(): Int {
@@ -74,5 +91,9 @@ open class UsersAdapter(private var onUserClickListener: OnUserClickListener) :
 
     override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
         holder.bind(searchList[position])
+    }
+
+    interface UsersAdapterInteraction {
+        fun downloadPhoto(link: String, imageHolder: ImageView)
     }
 }

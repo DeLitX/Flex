@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -14,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.Activities.ChatActivity
 import com.example.flex.Activities.CreateChat
 import com.example.flex.Adapters.ChatroomAdapter
-import com.example.flex.ChatroomViewModel
+import com.example.flex.ViewModels.ChatroomViewModel
 import com.example.flex.MainData
 import com.example.flex.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -65,5 +66,9 @@ class ChatroomFragment : Fragment(), ChatroomAdapter.ChatroomInteraction {
         val intent = Intent(this.context, ChatActivity::class.java)
         intent.putExtra(MainData.PUT_CHAT_ID, chatId)
         startActivity(intent)
+    }
+
+    override fun downloadPhoto(link: String, photoView: ImageView) {
+        mViewModel.downloadPhoto(link,photoView)
     }
 }

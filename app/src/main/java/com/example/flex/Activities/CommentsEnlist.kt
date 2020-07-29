@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.Adapters.CommentsAdapter
-import com.example.flex.HomeViewModel
+import com.example.flex.ViewModels.HomeViewModel
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.User
 import com.example.flex.R

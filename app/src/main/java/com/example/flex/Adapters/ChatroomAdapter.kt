@@ -44,10 +44,10 @@ class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
         fun bind(chat: Chat) {
             mChatId = chat.id
             if (chat.imageMini.trim().isNotEmpty()) {
-                Picasso.get().load(chat.imageMini).into(mChatImage)
+                mChatroomInteraction.downloadPhoto(chat.imageMini,mChatImage)
             } else {
                 if (chat.image.trim().isNotEmpty()) {
-                    Picasso.get().load(chat.image).into(mChatImage)
+                    mChatroomInteraction.downloadPhoto(chat.image,mChatImage)
                 }else{
                     mChatImage.setImageResource(R.drawable.ic_launcher_background)
                 }
@@ -69,5 +69,6 @@ class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
 
     interface ChatroomInteraction {
         fun enterChat(chatId: Long)
+        fun downloadPhoto(link:String,photoView:ImageView)
     }
 }

@@ -10,5 +10,6 @@ data class Chat(
     var image: String = "",
     var imageMini:String="",
     var lastMessage:String="",
-    var lastSenderName:String=""
+    var lastSenderName:String="",
+    var isGroup:Boolean=true
 )

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MainActivity">
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/frame_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,12 +18,35 @@
         style="@style/Widget.Design.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        android:background="@color/colorGrayishWhite"
+        android:background="@color/colorWhite"
+        app:itemHorizontalTranslationEnabled="false"
         app:itemIconTint="@drawable/item_state"
         app:itemTextColor="@drawable/item_state"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+        app:labelVisibilityMode="unlabeled"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_bar_menu" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/map_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:elevation="15dp"
+        android:src="@drawable/map_transperent"
+        app:civ_circle_background_color="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="@id/bottom_bar"
+        app:layout_constraintEnd_toEndOf="@id/bottom_bar"
+        app:layout_constraintStart_toStartOf="@id/bottom_bar"
+        app:layout_constraintTop_toTopOf="@id/bottom_bar" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        app:layout_constraintEnd_toEndOf="@id/bottom_bar"
+        app:layout_constraintTop_toTopOf="@id/bottom_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bottom_bar"
+        android:layout_marginEnd="24dp"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/colorPrimaryDark"
+        android:elevation="8dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

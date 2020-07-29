@@ -22,9 +22,8 @@ class ChatWebsocket(
     val client: OkHttpClient = OkHttpClient.Builder().build()
     var isFirst: Boolean = true
     private var mWebSocket: WebSocket? = null
-    private val mMaxCountOfMessages = 10
     fun connectChat(chatId: Long, yourUserId: Long) {
-        val link = "wss://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.GROUP_CHAT}"
+        val link = "wss://${MainData.BASE_URL}/${MainData.CHAT}"
         val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
         setThisChatId(chatId)
         connectWebsocket(link, cookie)
@@ -42,9 +41,13 @@ class ChatWebsocket(
             .url(link)
             .addHeader("Cookie", cookie)
             .build()
+        //to not make many connections
+        //closeWebsocket()
+
         mWebSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 if (true) {
+
                 }
             }
 
@@ -81,6 +84,7 @@ class ChatWebsocket(
     fun closeWebsocket() {
         if (mWebSocket != null) {
             mWebSocket!!.cancel()
+            isFirst=true
         }
     }
 
@@ -142,9 +146,8 @@ class ChatWebsocket(
                             }
                             setThisChatId(chatId)
                             mChatInteraction.setChatId(chatId)
-                            if (listOfMessages.size < mMaxCountOfMessages) {
-                                mChatInteraction.clearChat(chatId)
-                            }
+
+                            mChatInteraction.clearChat(chatId)
                             mChatInteraction.receiveMessages(listOfMessages)
                         }
                     }
@@ -168,18 +171,19 @@ class ChatWebsocket(
                 "}"
 
     }
-    private fun decodeMessageFromWebsocket(text:String):ChatMessage{
-        val json=JSONObject(text)
-        val temp=json["front"]
-        if(temp is JSONObject)
-        return ChatMessage(
-            text = temp["text"].toString(),
-            timeSent = temp["time"].toString().toLong(),
-            belongsToChat = chatId,
-            userId = temp["user_id"].toString().toLong(),
-            isMy = temp["user_id"].toString().toLong() == mUserId,
-            id=json["msg_id"].toString().toLong()
-        )else{
+
+    private fun decodeMessageFromWebsocket(text: String): ChatMessage {
+        val json = JSONObject(text)
+        val temp = json["front"]
+        if (temp is JSONObject)
+            return ChatMessage(
+                text = temp["text"].toString(),
+                timeSent = temp["time"].toString().toLong(),
+                belongsToChat = chatId,
+                userId = temp["user_id"].toString().toLong(),
+                isMy = temp["user_id"].toString().toLong() == mUserId,
+                id = json["msg_id"].toString().toLong()
+            ) else {
             return ChatMessage()
         }
     }
@@ -189,6 +193,6 @@ interface ChatInteraction {
     fun receiveMessage(message: ChatMessage)
     fun receiveMessages(messages: List<ChatMessage>)
     fun setChatId(chatId: Long)
-    fun setChatAvatar(chatId:Long,avatarLink:String)
+    fun setChatAvatar(chatId: Long, avatarLink: String)
     fun clearChat(chatId: Long)
 }

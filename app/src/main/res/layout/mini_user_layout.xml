@@ -7,7 +7,7 @@
     android:padding="@dimen/margin_border_a_little">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_avatar"
+        android:id="@+id/user_icon"
         style="@style/Icon.VeryMini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,6 +22,6 @@
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/user_avatar"
+        app:layout_constraintStart_toEndOf="@id/user_icon"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

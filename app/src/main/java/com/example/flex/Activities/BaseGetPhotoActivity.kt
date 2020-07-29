@@ -71,6 +71,8 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
                 if (counter == 2) {
                     mCanTakePhoto = true
                     takePicture()
+                }else{
+                    mCanTakePhoto=false
                 }
             } else {
 

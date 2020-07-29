@@ -57,10 +57,12 @@ object MainData {
     val PUT_USER_NAME="put name"
     val PUT_USER_ID="put id"
     val CREATE_CHAT="create_chat"
-    val GROUP_CHAT="group_chat"
+    val CHAT="chat"
     val PUT_CHAT_ID="put chat id"
     val VIEW_SUBSCRIBES="view_subscribes"
     val DOWNLOAD_MESSAGES="upload_messages"
     val PUT_IDS_LIST="id's list"
     val CREATE_GROUP_CHAT="create_group_chat"
+    val GET_CHAT_MEMBERS="get_chat_members"
+    val EXTRA_GO_TO_USER_ID="extra go to user id"
 }

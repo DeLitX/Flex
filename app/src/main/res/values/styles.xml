@@ -17,6 +17,10 @@
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">30dp</item>
     </style>
+    <style name="Icon.NotVeryMini">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_width">45dp</item>
+    </style>
     <style name="Icon.Mini">
         <item name="android:layout_height">60dp</item>
         <item name="android:layout_width">60dp</item>
@@ -66,5 +70,18 @@
 
     <style name="Base.Widget.Design.TabLayout.Custom">
         <item name="tabIndicatorColor">@color/colorGrayish</item>
+    </style>
+    <style name="Divider">
+        <item name="android:background">@color/colorDarkerGray</item>
+    </style>
+
+    <style name="Divider.Horizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="Divider.Vertical">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 </resources>

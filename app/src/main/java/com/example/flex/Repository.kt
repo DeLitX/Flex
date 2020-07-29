@@ -31,6 +31,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
     private val mChatMessageDao: ChatMessageDao
     private val mChatWebsocket: ChatWebsocket = makeChatWebsocket()
     private val mChatDao: ChatDao
+    private val mDependenciesDao:DependenciesDao
     val mainUser: LiveData<User>
     var searchResult: MutableLiveData<List<User>>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
@@ -45,6 +46,8 @@ class Repository(private val application: Application) : UserRequests.UserReques
     val isRegistSucceed: MutableLiveData<Boolean?>
     val isFollowersAvailable: MutableLiveData<Boolean?>
     val chatCreating:MutableLiveData<Boolean>
+    val errorText:MutableLiveData<String?>
+    val userGoTo:MutableLiveData<User?>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -52,6 +55,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
         mPosts = postDao.getSortedPosts()
         mUserDao = postDatabase.getUserDao()
         mChatMessageDao = postDatabase.getChatMessageDao()
+        mDependenciesDao=postDatabase.getDependenciesDao()
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         mainUser = mUserDao.getUser(sharedPreferences.getLong(MainData.YOUR_ID, 0))
@@ -71,6 +75,23 @@ class Repository(private val application: Application) : UserRequests.UserReques
         isRegistSucceed = MutableLiveData(null)
         isFollowersAvailable = MutableLiveData(null)
         chatCreating= MutableLiveData(false)
+        errorText= MutableLiveData(null)
+        userGoTo=MutableLiveData(null)
+    }
+    fun setGoToUser(user:User?){
+        userGoTo.postValue(user)
+    }
+    fun getChatUsers(chatId: Long):LiveData<List<User>>{
+        return mChatDao.getUsersOfChat(chatId)
+    }
+    fun refreshChatUsers(chatId: Long){
+        makeChatRequest().refreshChatUsers(chatId)
+    }
+    suspend fun getChat(chatId: Long):Chat?{
+        return mChatDao.getChat(chatId)
+    }
+    fun testNotification(){
+        makeUserRequests().testNotification()
     }
 
     fun deleteAllUserData() {
@@ -83,6 +104,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
     fun clearDatabase() {
         mChatMessageDao.deleteAll()
         mChatDao.deleteAllChats()
+        mDependenciesDao.deleteDependencies()
         mUserDao.deleteAll()
         mCommentDao.deleteAll()
         postDao.deleteAllPosts()
@@ -408,7 +430,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
         return getUserValueFromDB(id)
     }
 
-    suspend fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
+    fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
         return mChatMessageDao.getMessagesFromChat(chatId)
     }
 
@@ -661,6 +683,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
         mUserDao.insert(users)
     }
 
+    override fun setErrorText(text: String?) {
+        errorText.postValue(text)
+    }
+
     override fun receiveMessage(message: ChatMessage) {
         mChatMessageDao.insert(message)
     }
@@ -705,6 +731,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun setChatCreating(value: Boolean) {
         chatCreating.postValue(value)
+    }
+
+    override fun saveDependenciesToDB(dependencies: List<UserToChat>) {
+        mDependenciesDao.insert(dependencies)
     }
 
 

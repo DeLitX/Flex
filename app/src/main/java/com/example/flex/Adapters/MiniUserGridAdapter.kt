@@ -14,7 +14,7 @@ class MiniUserGridAdapter : RecyclerView.Adapter<MiniUserGridAdapter.MiniUserVie
     private val mUsersList = mutableListOf<User>()
 
     class MiniUserViewHolder(private val v: View) : RecyclerView.ViewHolder(v) {
-        private val mAvatar: ImageView = v.findViewById(R.id.user_avatar)
+        private val mAvatar: ImageView = v.findViewById(R.id.user_icon)
         private val mUsername: TextView = v.findViewById(R.id.user_nickname)
         fun bind(user: User) {
             if (user.imageUrlMini != "") {

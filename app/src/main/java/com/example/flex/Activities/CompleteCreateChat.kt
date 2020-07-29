@@ -2,7 +2,6 @@ package com.example.flex.Activities
 
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,10 +9,9 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.flex.ChatViewModel
+import com.example.flex.ViewModels.ChatViewModel
 import com.example.flex.Dialogs.BottomAddPhotoDialog
 import com.example.flex.MainData
 import com.example.flex.R

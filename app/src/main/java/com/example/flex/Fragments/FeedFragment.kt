@@ -20,6 +20,7 @@ import com.example.flex.Activities.SignIn
 import com.example.flex.Adapters.PostAdapter
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
+import com.example.flex.ViewModels.HomeViewModel
 
 class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
     PostAdapter.OnUserClickListener, PostAdapter.PostsInteraction {

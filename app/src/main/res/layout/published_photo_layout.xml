@@ -1,73 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/post_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="10dp">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/user_icon"
-            style="@style/Icon"
-            android:layout_alignParentTop="true" />
-
-        <TextView
-            style="@style/Text"
-            android:id="@+id/user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/user_icon"
-            android:layout_alignBottom="@id/user_icon"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_toEndOf="@id/user_icon"
-            android:layout_toRightOf="@id/user_icon"
-            android:gravity="center_vertical"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/menu_icon"
-            style="@style/TextIconSolid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/user_icon"
-            android:layout_alignBottom="@id/user_icon"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:text="@string/more_menu_icon"
-            android:textSize="30sp" />
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/post_text"
-        style="@style/Text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    android:layout_margin="5dp"
+    android:outlineProvider="background"
+    android:background="@drawable/rounded_corners"
+    android:orientation="vertical">
 
     <com.example.flex.SquareImageView
         android:id="@+id/main_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="15dp"
         android:scaleType="centerCrop"
-        android:layout_weight="1"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/main_image"
+        app:layout_constraintStart_toStartOf="@id/main_image"
+        android:background="@drawable/rounded_top_right_corner_transperent">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_icon"
+            style="@style/Icon.Mini"/>
+
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="200dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/post_text"
+        style="@style/Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_border_a_little"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/below_layout" />
 
     <RelativeLayout
         android:id="@+id/below_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp">
+        android:layout_margin="@dimen/margin_border_a_little"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_image">
 
         <TextView
             android:id="@+id/fire_icon"
@@ -80,8 +70,8 @@
             android:textSize="30sp" />
 
         <TextView
-            style="@style/Text"
             android:id="@+id/fire_count"
+            style="@style/Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/fire_icon"
@@ -107,8 +97,8 @@
             android:textSize="30sp" />
 
         <TextView
-            style="@style/Text"
             android:id="@+id/comments_count"
+            style="@style/Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/fire_icon"
@@ -134,8 +124,8 @@
             android:textSize="30sp" />
 
         <TextView
-            style="@style/Text"
             android:id="@+id/share_count"
+            style="@style/Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/fire_icon"
@@ -146,12 +136,7 @@
             android:layout_toRightOf="@id/share_icon"
             android:textSize="20sp" />
 
-        <FrameLayout
-            android:id="@+id/comment_frame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/fire_icon" />
 
     </RelativeLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

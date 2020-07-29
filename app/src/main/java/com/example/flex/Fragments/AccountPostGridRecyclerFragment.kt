@@ -15,7 +15,7 @@ import com.example.flex.Adapters.PhotosAdapter
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
 import com.example.flex.R
-import com.example.flex.AccountViewModel
+import com.example.flex.ViewModels.AccountViewModel
 import com.example.flex.MainData
 
 class AccountPostGridRecyclerFragment(private var mUser: User?, private val mUpdater: UserUpdates) :

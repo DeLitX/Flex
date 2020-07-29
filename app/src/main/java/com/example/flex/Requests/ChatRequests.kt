@@ -4,6 +4,7 @@ import com.example.flex.MainData
 import com.example.flex.POJO.Chat
 import com.example.flex.POJO.ChatMessage
 import com.example.flex.POJO.User
+import com.example.flex.POJO.UserToChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -89,6 +90,52 @@ class ChatRequests(
         })
     }
 
+    fun refreshChatUsers(chatId: Long) {
+        val formBody = FormBody.Builder()
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .add("chat_id", chatId.toString())
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.GET_CHAT_MEMBERS}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val body = response.body?.string()
+                    if (body != null) {
+                        CoroutineScope(IO).launch {
+                            val jsonObject = JSONObject(body)
+                            val jsonArray = jsonObject["chat_members"]
+                            if (jsonArray is JSONArray) {
+                                val dependencies = mutableListOf<UserToChat>()
+                                val length = jsonArray.length()
+                                for (i in 0 until length) {
+                                    val value = jsonArray[i]
+                                    dependencies.add(
+                                        UserToChat(
+                                            chatId = chatId,
+                                            userId = value.toString().toLong()
+                                        )
+                                    )
+                                }
+                                mChatroomInteraction.saveDependenciesToDB(dependencies)
+                            }
+                        }
+                    }
+                }
+            }
+
+        })
+    }
+
     suspend fun createGroupChat(users: List<Long>, groupName: String, chatPhoto: File? = null) {
         mChatroomInteraction.setChatCreating(true)
         val linkToAvatar =
@@ -165,7 +212,8 @@ class ChatRequests(
                                             name = value["chat_name"].toString(),
                                             image = value["chat_ava"].toString(),
                                             lastMessage = value["last_message"].toString(),
-                                            lastSenderName = value["last_sender"].toString()
+                                            lastSenderName = value["last_sender"].toString(),
+                                            isGroup = value["is_group"].toString().toBoolean()
                                         )
                                     )
                             }
@@ -198,5 +246,6 @@ class ChatRequests(
         fun deleteMessagesFromChat(chatId: Long)
         suspend fun uploadPhoto(file: File): Pair<String, String>
         fun setChatCreating(value: Boolean)
+        fun saveDependenciesToDB(dependencies: List<UserToChat>)
     }
 }

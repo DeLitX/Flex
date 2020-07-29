@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.flex.AccountViewModel
+import com.example.flex.ViewModels.AccountViewModel
 import com.example.flex.Activities.CommentsEnlist
 import com.example.flex.Adapters.PostAdapter
 import com.example.flex.MainData
@@ -21,7 +21,8 @@ import com.example.flex.POJO.User
 import com.example.flex.R
 
 class AccountPostListRecyclerFragment(
-    private var user: User?
+    private var user: User?,
+    private val mInteraction:ListInteraction
 ) : Fragment(), PostAdapter.OnUserClickListener, PostAdapter.PostsInteraction {
     lateinit var v: View
     private lateinit var mRecycler: RecyclerView
@@ -45,17 +46,13 @@ class AccountPostListRecyclerFragment(
             adapter.submitList(it)
 
         })
-        addActionListener()
         loadPosts()
+        mInteraction.scrollToPost()
         return v
     }
 
     fun scrollToPost(postNumber: Int) {
         mRecycler.scrollToPosition(postNumber)
-    }
-
-    private fun addActionListener() {
-
     }
 
     private fun loadRecycler() {
@@ -103,5 +100,8 @@ class AccountPostListRecyclerFragment(
 
     override suspend fun getUserFromNetwork(userId: Long): User {
         return mAccountViewModel.getUserById(userId)
+    }
+    interface ListInteraction{
+        fun scrollToPost()
     }
 }

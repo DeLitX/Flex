@@ -1,16 +1,15 @@
-package com.example.flex
+package com.example.flex.ViewModels
 
 import android.app.Application
 import android.widget.ImageView
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.flex.POJO.Chat
 import com.example.flex.POJO.ChatMessage
 import com.example.flex.POJO.User
 import java.io.File
 
-class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
-    private val mRepository: Repository = Repository(app)
+class ChatViewModel(private val app: Application) : BaseViewModel(app) {
     val chatId: MutableLiveData<Long>
     val chatCreating:LiveData<Boolean>
 
@@ -19,10 +18,13 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
         chatCreating=mRepository.chatCreating
     }
 
-    suspend fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
+    fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
         return mRepository.getChatMessages(chatId)
     }
 
+    suspend fun getChat(chatId:Long): Chat?{
+        return mRepository.getChat(chatId)
+    }
     fun sendMessage(text: String, user: User) {
         mRepository.sendMessage(text, user)
     }
@@ -59,10 +61,13 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
     fun closeChat(){
         mRepository.closeChat()
     }
-    fun downloadPhotoByUrl(url:String,photoView:ImageView){
-        mRepository.downloadPhoto(url,photoView)
-    }
     fun loadMessages(chatId:Long,idOfLast:Long=0){
         mRepository.loadMessages(chatId,idOfLast)
+    }
+    fun getChatUsers(chatId: Long):LiveData<List<User>>{
+        return mRepository.getChatUsers(chatId)
+    }
+    fun refreshChatUsers(chatId: Long){
+        mRepository.refreshChatUsers(chatId)
     }
 }

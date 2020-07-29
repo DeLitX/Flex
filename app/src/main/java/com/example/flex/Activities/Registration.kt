@@ -7,7 +7,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.flex.AccountViewModel
+import com.example.flex.ViewModels.AccountViewModel
 import com.example.flex.R
 
 class Registration : AppCompatActivity() {
