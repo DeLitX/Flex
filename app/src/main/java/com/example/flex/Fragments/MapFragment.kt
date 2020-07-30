@@ -32,13 +32,16 @@ class MapFragment : Fragment() {
     private lateinit var v: View
     private var mMapView: MapView? = null
     private lateinit var mGMap: GoogleMap
-    private final val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
-    private final val ERROR_DIALOG_REQUEST = 9001
+    private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
+    private val ERROR_DIALOG_REQUEST = 9001
     private val REQUEST_MAP_PERMISSIONS = 1234
     private var mLocationPermissionGranted: Boolean = false
     private val PERMISSION_REQUEST_ENABLE_GPS = 12312
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private var mIsGpsDialogShowing: Boolean = false
+    private val MAX_ZOOM: Float = 30f
+    private val MIN_ZOOM: Float = (-20).toFloat()
+    private var isFirstEnter:Boolean=true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +59,73 @@ class MapFragment : Fragment() {
         return v
     }
 
+
+    private fun setupMap() {
+        mMapView?.getMapAsync {
+            mGMap = it
+            val uiSettings = mGMap.uiSettings
+            uiSettings.isCompassEnabled = true
+            uiSettings.isIndoorLevelPickerEnabled = true
+            uiSettings.isZoomGesturesEnabled = true
+            uiSettings.isMyLocationButtonEnabled = true
+            uiSettings.isMapToolbarEnabled = true
+
+            if (ActivityCompat.checkSelfPermission(
+                    this.context!!,
+                    ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this.context!!,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return@getMapAsync
+            }
+            mGMap.isMyLocationEnabled = true
+
+            mGMap.setMinZoomPreference(MIN_ZOOM)
+            mGMap.setMaxZoomPreference(MAX_ZOOM)
+        }
+        getDeviceLocation()
+    }
+
+    private fun moveCamera(position: LatLng, zoom: Float = 12f, tilt: Float = 20f) {
+        val tiltTemp = if (tilt <= 0) 0f else if (tilt > 90) 90f else tilt
+        val camBuilder = CameraPosition.builder()
+        camBuilder.zoom(12f)
+        camBuilder.tilt(20f)
+        camBuilder.target(position)
+        val cameraPosition = camBuilder.build()
+
+        mGMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+    }
+
+    private fun moveCamera(position: Pair<Double, Double>, zoom: Float = 12f, tilt: Float = 20f) {
+        moveCamera(LatLng(position.first, position.second), zoom, tilt)
+    }
+
+    private fun getDeviceLocation() {
+        this.context?.let { it ->
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(it)
+            if (ActivityCompat.checkSelfPermission(
+                    it,
+                    ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            mFusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
+                val location = task.result
+                if(isFirstEnter&&location!=null){
+                    moveCamera(LatLng(location.latitude,location.longitude))
+                    isFirstEnter=!isFirstEnter
+                }
+            }
+        }
+    }
+
     private fun isGPSEnabled(): Boolean {
         val manager: LocationManager =
             this.activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -64,21 +134,6 @@ class MapFragment : Fragment() {
             return false
         }
         return true
-    }
-
-    private fun buildAlertMessageNoGps() {
-        if (!mIsGpsDialogShowing) {
-            val builder = AlertDialog.Builder(this.context)
-            builder.setMessage(R.string.gps_require)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
-                    val intent = Intent(ACTION_LOCATION_SOURCE_SETTINGS)
-                    startActivityForResult(intent, PERMISSION_REQUEST_ENABLE_GPS)
-                }
-            val alert = builder.create()
-            mIsGpsDialogShowing = true
-            alert.show()
-        }
     }
 
     private fun isServicesOK(): Boolean {
@@ -115,66 +170,25 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun setupMap() {
-        mMapView?.getMapAsync {
-            mGMap = it
-            val uiSettings = mGMap.uiSettings
-            uiSettings.isCompassEnabled = true
-            uiSettings.isIndoorLevelPickerEnabled = true
-            uiSettings.isZoomGesturesEnabled = true
-            uiSettings.isMyLocationButtonEnabled = true
-            uiSettings.isMapToolbarEnabled = true
-
-            if (ActivityCompat.checkSelfPermission(
-                    this.context!!,
-                    ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this.context!!,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return@getMapAsync
-            }
-            mGMap.isMyLocationEnabled = true
-
-            mGMap.setMinZoomPreference(-20f)
-            mGMap.setMaxZoomPreference(20f)
+    private fun buildAlertMessageNoGps() {
+        if (!mIsGpsDialogShowing) {
+            val builder = AlertDialog.Builder(this.context)
+            builder.setMessage(R.string.gps_require)
+                .setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
+                    val intent = Intent(ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivityForResult(intent, PERMISSION_REQUEST_ENABLE_GPS)
+                }
+                .setNegativeButton("No") { dialogInterface: DialogInterface, i: Int ->
+                    dialogInterface.cancel()
+                }
+                .setOnCancelListener {
+                    this.activity?.onBackPressed()
+                    mIsGpsDialogShowing = false
+                }
+            val alert = builder.create()
+            mIsGpsDialogShowing = true
+            alert.show()
         }
-        getDeviceLocation()
-    }
-
-    private fun getDeviceLocation() {
-        this.context?.let { it ->
-            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(it)
-            if (ActivityCompat.checkSelfPermission(
-                    it,
-                    ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            mFusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
-                val location = task.result
-            }
-        }
-    }
-
-    private fun moveCamera(position: LatLng, zoom: Float = 12f, tilt: Float = 20f) {
-        val tiltTemp = if (tilt <= 0) 0f else if (tilt > 90) 90f else tilt
-        val camBuilder = CameraPosition.builder()
-        camBuilder.zoom(12f)
-        camBuilder.tilt(20f)
-        camBuilder.target(position)
-        val cameraPosition = camBuilder.build()
-
-        mGMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-    }
-
-    private fun moveCamera(position: Pair<Double, Double>, zoom: Float = 12f, tilt: Float = 20f) {
-        moveCamera(LatLng(position.first, position.second), zoom, tilt)
     }
 
     override fun onRequestPermissionsResult(
@@ -229,6 +243,7 @@ class MapFragment : Fragment() {
     override fun onStop() {
         mMapView?.onStop()
         super.onStop()
+        isFirstEnter=true
     }
 
     override fun onPause() {

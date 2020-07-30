@@ -23,27 +23,23 @@ class ChatWebsocket(
     var isFirst: Boolean = true
     private var mWebSocket: WebSocket? = null
     fun connectChat(chatId: Long, yourUserId: Long) {
-        val link = "wss://${MainData.BASE_URL}/${MainData.CHAT}"
         val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
         setThisChatId(chatId)
-        connectWebsocket(link, cookie)
+        connectWebsocket( cookie)
     }
 
     fun connectChat(user: String, yourUserId: Long) {
-        val link = "wss://${MainData.BASE_URL}/${MainData.CHATROOM}/$user"
-        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId"
-        connectWebsocket(link, cookie)
+        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;username=$user"
+        connectWebsocket(cookie)
     }
 
-    private fun connectWebsocket(link: String, cookie: String) {
+    private fun connectWebsocket(cookie: String) {
         this.user = user
+        val link = "wss://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CHAT}"
         val request = Request.Builder()
             .url(link)
             .addHeader("Cookie", cookie)
             .build()
-        //to not make many connections
-        //closeWebsocket()
-
         mWebSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 if (true) {
@@ -83,8 +79,8 @@ class ChatWebsocket(
 
     fun closeWebsocket() {
         if (mWebSocket != null) {
-            mWebSocket!!.cancel()
-            isFirst=true
+            mWebSocket!!.close(4025,"user left this chat")
+            isFirst = true
         }
     }
 
