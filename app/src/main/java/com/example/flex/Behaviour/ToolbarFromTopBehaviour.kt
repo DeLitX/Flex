@@ -103,7 +103,7 @@ class ToolbarFromTopBehaviour(private val context: Context, private val attrs: A
     }
 
     fun convertPercentToHex(percent: Int): String {
-        val v: String = java.lang.Integer.toHexString((percent / 100f * 256).toInt())
+        val v: String = Integer.toHexString((percent / 100f * 256).toInt())
         return if (percent == 100) "ff"
         else if (percent <= 6) "0$v"
         else v

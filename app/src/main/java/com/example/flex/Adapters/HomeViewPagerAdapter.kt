@@ -2,7 +2,7 @@ package com.example.flex.Adapters
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.flex.Fragments.ChatroomFragment
+import com.example.flex.Fragments.ChatRoomFragment
 import com.example.flex.Fragments.FeedFragment
 
 class HomeViewPagerAdapter(
@@ -10,7 +10,7 @@ class HomeViewPagerAdapter(
     private val mFragment:Fragment
 ) : FragmentStateAdapter(mFragment) {
     private val mFeedFragment: FeedFragment = FeedFragment(mHomeInteraction)
-    private val mChatroomFragment: ChatroomFragment = ChatroomFragment()
+    private val mChatroomFragment: ChatRoomFragment = ChatRoomFragment()
     val pagesCount = 2
     fun scrollFeedFragmentToBeginning() {
         mFeedFragment.scrollToBeginning()

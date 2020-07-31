@@ -32,7 +32,7 @@ class CameraFragment : Fragment() {
         v = inflater.inflate(R.layout.fragment_photo, container, false)
 
         mViewModel = ViewModelProviders.of(this).get(AccountViewModel::class.java)
-        mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {it->
+        mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 val intent = Intent(this.context, SignIn::class.java)
                 startActivity(intent)
@@ -48,7 +48,7 @@ class CameraFragment : Fragment() {
         return v
     }
 
-    fun addActionListener() {
+    private fun addActionListener() {
         val btnLogout = v.findViewById<Button>(R.id.button_logout)
         val changePassBtn = v.findViewById<Button>(R.id.button_change_pass)
         val makePostBtn = v.findViewById<Button>(R.id.button_make_post)

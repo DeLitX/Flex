@@ -8,6 +8,8 @@ import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.flex.DataBase.*
+import com.example.flex.Enums.ChatConnectEnum
+import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.POJO.*
 import com.example.flex.Requests.*
 import com.example.flex.Websockets.ChatInteraction
@@ -22,7 +24,7 @@ import java.util.*
 
 class Repository(private val application: Application) : UserRequests.UserRequestsInteraction,
     PostRequests.PostRequestsInteraction, RegistRequests.RegistRequestInteraction, ChatInteraction,
-    ChatRequests.ChatroomInteraction, SearchRequests.SearchInteraction {
+    ChatRequests.ChatRoomInteraction, SearchRequests.SearchInteraction {
     val postDao: PostDao
     val postsInFeed: LiveData<List<Post>>
     private val mPosts: LiveData<List<Post>>
@@ -48,6 +50,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
     val chatCreating:MutableLiveData<Boolean>
     val errorText:MutableLiveData<String?>
     val userGoTo:MutableLiveData<User?>
+    val chatConnectStatus:MutableLiveData<ChatConnectEnum>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -77,6 +80,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
         chatCreating= MutableLiveData(false)
         errorText= MutableLiveData(null)
         userGoTo=MutableLiveData(null)
+        chatConnectStatus= MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
     }
     fun setGoToUser(user:User?){
         userGoTo.postValue(user)
@@ -144,7 +148,8 @@ class Repository(private val application: Application) : UserRequests.UserReques
                 userImgLink = user.imageUrl,
                 userName = user.name,
                 belongsToChat = mChatWebsocket.chatId,
-                timeSent = Calendar.getInstance().timeInMillis
+                timeSent = Calendar.getInstance().timeInMillis,
+                sentStatus = MessageSentEnum.SENDING
             )
             mChatWebsocket.sendMessage(message)
             mChatMessageDao.insert(
@@ -699,6 +704,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun clearChat(chatId: Long) {
         mChatMessageDao.deleteAllFromChat(chatId)
+    }
+
+    override fun setConnectToChat(value: ChatConnectEnum) {
+        chatConnectStatus.postValue(value)
     }
 
     override fun setChatId(chatId: Long) {

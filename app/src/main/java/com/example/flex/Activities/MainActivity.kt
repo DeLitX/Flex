@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
     var map = MapFragment()
     var camera = CameraFragment()
     private lateinit var mBnv: BottomNavigationView
-        private set
     private lateinit var mViewModel: AccountViewModel
     private lateinit var mMapIcon: ImageView
 

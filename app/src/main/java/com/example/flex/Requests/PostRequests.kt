@@ -76,8 +76,6 @@ class PostRequests(
                     mPostRequestsInteraction.updatePost(post)
                 } else if (response.code == MainData.ERR_403) {
                     makeUserSignIn()
-                } else {
-
                 }
             }
         })
@@ -106,8 +104,6 @@ class PostRequests(
                     mPostRequestsInteraction.updatePost(post)
                 } else if (response.code == MainData.ERR_403) {
                     makeUserSignIn()
-                } else {
-
                 }
             }
         })
@@ -138,8 +134,6 @@ class PostRequests(
 
                 } else if (response.code == MainData.ERR_403) {
                     makeUserSignIn()
-                } else {
-
                 }
             }
         })

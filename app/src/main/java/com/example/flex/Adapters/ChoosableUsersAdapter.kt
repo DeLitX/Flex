@@ -22,7 +22,7 @@ open class ChoosableUsersAdapter(private val mChoosableUsersInteraction: Choosab
         return ChoosableUsersViewHolder(view,mChoosableUsersInteraction)
     }
 
-    interface ChoosableUsersInteraction : UsersAdapter.UsersAdapterInteraction {
+    interface ChoosableUsersInteraction : UsersAdapterInteraction {
         fun chooseUser(user: User)
         fun unChooseUser(user: User)
     }

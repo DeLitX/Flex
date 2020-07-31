@@ -73,7 +73,7 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
             mIsPostsRefreshing = it
         })
         v.findViewById<ImageView>(R.id.chatroom_button).setOnClickListener {
-            mHomeInteraction.goToChatroom()
+            mHomeInteraction.goToChatRoom()
         }
     }
 
@@ -158,6 +158,6 @@ class FeedFragment(private val mHomeInteraction: HomeInteraction) : Fragment(),
     }
 
     interface HomeInteraction {
-        fun goToChatroom()
+        fun goToChatRoom()
     }
 }

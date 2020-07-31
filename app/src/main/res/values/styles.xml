@@ -53,6 +53,9 @@
     <style name="Text.Gray.Mini">
         <item name="android:textSize">@dimen/text_mini_size</item>
     </style>
+    <style name="Text.Gray.VeryMini">
+        <item name="android:textSize">@dimen/text_very_mini_size</item>
+    </style>
 
     <style name="TextIconSolid">
         <item name="android:textColor">@color/text_black</item>

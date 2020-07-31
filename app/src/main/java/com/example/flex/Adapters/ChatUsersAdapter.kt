@@ -3,7 +3,6 @@ package com.example.flex.Adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import com.example.flex.POJO.User
 import com.example.flex.R

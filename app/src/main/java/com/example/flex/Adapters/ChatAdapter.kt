@@ -7,17 +7,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.POJO.ChatMessage
 import com.example.flex.POJO.User
 import com.example.flex.R
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.util.*
 
-class ChatAdapter(private val mChatInterction: ChatInteraction) :
+class ChatAdapter(private val mChatInteraction: ChatInteraction) :
     androidx.recyclerview.widget.ListAdapter<ChatMessage, ChatAdapter.ChatViewHolder>(object :
         DiffUtil.ItemCallback<ChatMessage>() {
         override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
@@ -28,7 +31,9 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
         override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
             return oldItem.text == newItem.text &&
                     oldItem.isMy == newItem.isMy &&
-                    oldItem.userName == newItem.userName
+                    oldItem.userName == newItem.userName &&
+                    oldItem.sentStatus == newItem.sentStatus &&
+                    oldItem.timeSent == newItem.timeSent
         }
 
     }) {
@@ -40,27 +45,53 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
         private val userAvatar: ImageView = v.findViewById(R.id.message_sender_avatar)
         private val userName: TextView = v.findViewById(R.id.message_sender_name)
         private val messageText: TextView = v.findViewById(R.id.message_text)
+        private val messageStatus: TextView = v.findViewById(R.id.message_status)
+        private val messageTime: TextView = v.findViewById(R.id.message_time)
         var user: User? = null
 
         init {
             userAvatar.setOnClickListener {
-                if (user == null) {
-
-                } else {
-
+                if (user != null) {
+                    //TODO
                 }
             }
         }
 
         fun bind(message: ChatMessage) {
             messageText.text = message.text
+            val time=Date(message.timeSent)
+            messageTime.text = "${time.hours}:${time.minutes}"
+            if (message.isMy) {
+                messageStatus.text = when (message.sentStatus) {
+                    MessageSentEnum.SENDING -> {
+                        v.context.getString(R.string.sending)
+                    }
+                    MessageSentEnum.NOT_SENT -> {
+                        v.context.getString(R.string.not_sent)
+                    }
+                    MessageSentEnum.FAILED_TO_SEND -> {
+                        v.context.getString(R.string.failed_send)
+                    }
+                    MessageSentEnum.SENT -> {
+                        v.context.getString(R.string.sent)
+                    }
+                    MessageSentEnum.RECEIVED -> {
+                        v.context.getString(R.string.sent)
+                    }
+                    else -> {
+                        ""
+                    }
+                }
+            } else {
+                messageStatus.text = ""
+            }
             CoroutineScope(IO).launch {
                 user = mChatInteraction.getUserById(message.userId)
                 withContext(Main) {
                     userName.text = user?.name
                     user?.imageUrl?.let {
                         if (it != "") {
-                            mChatInteraction.downloadPhotoByUrl(it,userAvatar)
+                            mChatInteraction.downloadPhotoByUrl(it, userAvatar)
                         }
                     }
                 }
@@ -86,7 +117,7 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
                 R.layout.message_ingoing
             }, parent, false
         )
-        return ChatViewHolder(view, mChatInterction)
+        return ChatViewHolder(view, mChatInteraction)
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
@@ -98,7 +129,7 @@ class ChatAdapter(private val mChatInterction: ChatInteraction) :
     }
 
     interface ChatInteraction {
-        fun downloadPhotoByUrl(url:String,photoView:ImageView)
+        fun downloadPhotoByUrl(url: String, photoView: ImageView)
         suspend fun getUserById(id: Long): User
     }
 }

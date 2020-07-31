@@ -10,7 +10,7 @@ import java.io.IOException
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-class ForgotPassRequests() {
+class ForgotPassRequests {
     private val client: OkHttpClient
     private val cookieManager = CookieManager()
 
@@ -57,8 +57,6 @@ class ForgotPassRequests() {
                     CoroutineScope(Main).launch {
                         isCanBeChanged.value=true
                     }
-                } else {
-
                 }
             }
         })
@@ -86,8 +84,6 @@ class ForgotPassRequests() {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     //TODO
-                } else {
-
                 }
             }
         })

@@ -3,10 +3,8 @@ package com.example.flex.Activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.View
+import android.widget.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -15,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.flex.Adapters.ChatAdapter
+import com.example.flex.Enums.ChatConnectEnum
 import com.example.flex.Fragments.ChatUserListRecycler
 import com.example.flex.ViewModels.ChatViewModel
 import com.example.flex.MainData
@@ -53,6 +52,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_activity)
         mViewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
+
         firstConnectToChat()
         bindActivity()
     }
@@ -92,7 +92,34 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
         mViewPager = findViewById(R.id.chat_info_view_pager)
         mViewPager.adapter = mViewPagerAdapter
         mViewPagerAdapter.addFragment(mUsersFragment, "Members")
+        val chatStatusText:TextView=findViewById(R.id.chat_status)
+        val chatStatus:ProgressBar=findViewById(R.id.connecting_chat_progress_bar)
+        mViewModel.chatConnectStatus.observe(this, Observer {
+            when(it){
+                ChatConnectEnum.NOT_CONNECTED->{
+                    chatStatusText.text=getString(R.string.not_connected)
+                    chatStatus.visibility= View.GONE
+                }
+                ChatConnectEnum.CONNECTED->{
+                    chatStatusText.text=getString(R.string.connected)
+                    chatStatus.visibility= View.GONE
+                }
+                ChatConnectEnum.CONNECTING->{
+                    chatStatusText.text=getString(R.string.connecting)
+                    chatStatus.isIndeterminate=true
+                    chatStatus.visibility= View.VISIBLE
 
+                }
+                ChatConnectEnum.FAILED_CONNECT->{
+                    chatStatusText.text=getString(R.string.failed_connect)
+                    chatStatus.visibility= View.GONE
+                }
+                null->{
+                    chatStatusText.text=getString(R.string.not_connected)
+                    chatStatus.visibility= View.GONE
+                }
+            }
+        })
         val editChat: ImageView = findViewById(R.id.edit_icon)
         editChat.setOnClickListener {
 
@@ -126,12 +153,13 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
                 mCurrentMessagePosition += dy
                 if (recyclerView.adapter != null) {
                     if (mAdapter.itemCount >= 30) {
-                        if (recyclerView.adapter!!.itemCount.toLong() - mCurrentMessagePosition < 10) {
+                        /*if (recyclerView.adapter!!.itemCount.toLong() - mCurrentMessagePosition < 5) {
                             mViewModel.loadMessages(
                                 mChatId,
                                 mAdapter.getItemByPosition(mAdapter.itemCount - 1).id
                             )
-                        }
+                        }*/
+                        //TODO
                     }
                 }
             }
@@ -151,7 +179,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
         val chatId = intent.getLongExtra(MainData.PUT_CHAT_ID, 0)
         val lifecycleOwner: LifecycleOwner = this
         if (chatId == 0.toLong()) {
-            mViewModel.chatId.observe(lifecycleOwner, Observer { it ->
+            mViewModel.chatId.observe(lifecycleOwner, Observer {
                 mChatId = it
                 mViewModel.getChatUsers(mChatId).observe(this, Observer { users ->
                     mUsersFragment.adapter.addUsers(users)

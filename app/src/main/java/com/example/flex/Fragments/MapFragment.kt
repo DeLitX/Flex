@@ -198,7 +198,7 @@ class MapFragment : Fragment() {
     ) {
         if (requestCode == REQUEST_MAP_PERMISSIONS) {
             if (grantResults.isNotEmpty()) {
-                var counter: Int = 0
+                var counter= 0
                 for (i in 0..permissions.size - 1) {
                     val permission = permissions[i]
                     if (ACCESS_FINE_LOCATION == permission) {

@@ -14,25 +14,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.Activities.ChatActivity
 import com.example.flex.Activities.CreateChat
-import com.example.flex.Adapters.ChatroomAdapter
-import com.example.flex.ViewModels.ChatroomViewModel
+import com.example.flex.Adapters.ChatRoomAdapter
+import com.example.flex.ViewModels.ChatRoomViewModel
 import com.example.flex.MainData
 import com.example.flex.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class ChatroomFragment : Fragment(), ChatroomAdapter.ChatroomInteraction {
+class ChatRoomFragment : Fragment(), ChatRoomAdapter.ChatRoomInteraction {
 
     private lateinit var v: View
-    private lateinit var mAdapter: ChatroomAdapter
+    private lateinit var mAdapter: ChatRoomAdapter
     private lateinit var mRecycler: RecyclerView
-    private lateinit var mViewModel: ChatroomViewModel
+    private lateinit var mViewModel: ChatRoomViewModel
     private lateinit var mAddChatButton:FloatingActionButton
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         v = inflater.inflate(R.layout.fragment_chatroom, container, false)
-        mViewModel = ViewModelProviders.of(this).get(ChatroomViewModel::class.java)
+        mViewModel = ViewModelProviders.of(this).get(ChatRoomViewModel::class.java)
         mViewModel.chatList.observe(viewLifecycleOwner, Observer {
             mAdapter.submitList(it)
             v.findViewById<TextView>(R.id.text_no_chats).text=if(it.isEmpty()){
@@ -54,7 +54,7 @@ class ChatroomFragment : Fragment(), ChatroomAdapter.ChatroomInteraction {
     private fun loadRecycler() {
         mRecycler = v.findViewById(R.id.chatroom_recycler)
         mRecycler.layoutManager = LinearLayoutManager(v.context)
-        mAdapter = ChatroomAdapter(this)
+        mAdapter = ChatRoomAdapter(this)
         mRecycler.adapter = mAdapter
     }
 

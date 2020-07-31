@@ -1,5 +1,7 @@
 package com.example.flex.Websockets
 
+import com.example.flex.Enums.ChatConnectEnum
+import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.MainData
 import com.example.flex.POJO.ChatMessage
 import kotlinx.coroutines.CoroutineScope
@@ -9,6 +11,7 @@ import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import java.lang.Exception
 
 class ChatWebsocket(
     val mChatInteraction: ChatInteraction,
@@ -22,10 +25,11 @@ class ChatWebsocket(
     val client: OkHttpClient = OkHttpClient.Builder().build()
     var isFirst: Boolean = true
     private var mWebSocket: WebSocket? = null
+    private var mFailedToConnect: Int = 0
     fun connectChat(chatId: Long, yourUserId: Long) {
         val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
         setThisChatId(chatId)
-        connectWebsocket( cookie)
+        connectWebsocket(cookie)
     }
 
     fun connectChat(user: String, yourUserId: Long) {
@@ -40,26 +44,36 @@ class ChatWebsocket(
             .url(link)
             .addHeader("Cookie", cookie)
             .build()
+        mChatInteraction.setConnectToChat(ChatConnectEnum.CONNECTING)
         mWebSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                if (true) {
-
-                }
+                mChatInteraction.setConnectToChat(ChatConnectEnum.CONNECTED)
+                mFailedToConnect = 0
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (isFirst) {
                     isFirst = false
                 } else {
-                    mChatInteraction.receiveMessage(
-                        decodeMessageFromWebsocket(text)
-                    )
+                    try {
+                        mChatInteraction.receiveMessage(
+                            decodeMessageFromWebsocket(text)
+                        )
+                    } catch (e: Exception) {
+
+                    }
+
                 }
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                if (true) {
-
+                mFailedToConnect++
+                mChatInteraction.setConnectToChat(ChatConnectEnum.CONNECTING)
+                isFirst = true
+                if (mFailedToConnect < 10) {
+                    connectWebsocket(cookie)
+                }else{
+                    mChatInteraction.setConnectToChat(ChatConnectEnum.FAILED_CONNECT)
                 }
             }
 
@@ -79,7 +93,7 @@ class ChatWebsocket(
 
     fun closeWebsocket() {
         if (mWebSocket != null) {
-            mWebSocket!!.close(4025,"user left this chat")
+            mWebSocket!!.close(4025, "user left this chat")
             isFirst = true
         }
     }
@@ -134,7 +148,8 @@ class ChatWebsocket(
                                                 belongsToChat = chatId,
                                                 userId = temp["sender_id"].toString().toLong(),
                                                 isMy = temp["sender_id"].toString()
-                                                    .toLong() == mUserId
+                                                    .toLong() == mUserId,
+                                                sentStatus = MessageSentEnum.RECEIVED
                                             )
                                         )
                                     }
@@ -170,18 +185,16 @@ class ChatWebsocket(
 
     private fun decodeMessageFromWebsocket(text: String): ChatMessage {
         val json = JSONObject(text)
-        val temp = json["front"]
-        if (temp is JSONObject)
-            return ChatMessage(
-                text = temp["text"].toString(),
-                timeSent = temp["time"].toString().toLong(),
-                belongsToChat = chatId,
-                userId = temp["user_id"].toString().toLong(),
-                isMy = temp["user_id"].toString().toLong() == mUserId,
-                id = json["msg_id"].toString().toLong()
-            ) else {
-            return ChatMessage()
-        }
+        val temp = JSONObject(json["front"].toString())
+        return ChatMessage(
+            text = temp["text"].toString(),
+            timeSent = temp["time"].toString().toLong(),
+            belongsToChat = chatId,
+            userId = temp["user_id"].toString().toLong(),
+            isMy = temp["user_id"].toString().toLong() == mUserId,
+            id = json["msg_id"].toString().toLong(),
+            sentStatus = MessageSentEnum.RECEIVED
+        )
     }
 }
 
@@ -191,4 +204,5 @@ interface ChatInteraction {
     fun setChatId(chatId: Long)
     fun setChatAvatar(chatId: Long, avatarLink: String)
     fun clearChat(chatId: Long)
+    fun setConnectToChat(value:ChatConnectEnum)
 }

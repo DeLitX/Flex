@@ -1,6 +1,5 @@
 package com.example.flex.Fragments
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.Activities.MainActivity
 import com.example.flex.Adapters.UsersAdapter
-import com.example.flex.MainData
 import com.example.flex.POJO.User
 import com.example.flex.R
 import com.example.flex.ViewModels.SearchViewModel
@@ -39,7 +37,7 @@ class SearchRecyclerFragment : Fragment(), UsersAdapter.OnUserClickListener,
         mViewModel.searchResult.observe(viewLifecycleOwner, Observer {
             mSearchAdapter.setUsers(it)
         })
-        mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {it->
+        mViewModel.isMustSignIn.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 val intent = Intent(this.context, SignIn::class.java)
                 startActivity(intent)

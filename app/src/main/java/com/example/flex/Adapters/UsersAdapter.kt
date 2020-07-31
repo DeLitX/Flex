@@ -20,8 +20,7 @@ open class UsersAdapter(
     constructor(mUsersAdapterInteraction: UsersAdapterInteraction) : this(
         null,
         mUsersAdapterInteraction
-    ) {
-    }
+    )
 
     open class UsersViewHolder(
         private val v: View,
@@ -36,8 +35,7 @@ open class UsersAdapter(
             v,
             null,
             mUsersAdapterInteraction
-        ) {
-        }
+        )
 
         init {
             v.setOnClickListener(this)

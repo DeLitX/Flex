@@ -1,13 +1,10 @@
 package com.example.flex.ViewModels
 
 import android.app.Application
-import android.widget.ImageView
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
-import com.example.flex.Repository
 
 class HomeViewModel(application: Application) : BaseViewModel(application) {
     var postsInFeed: LiveData<List<Post>>

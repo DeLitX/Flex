@@ -48,7 +48,8 @@
         android:layout_margin="@dimen/margin_border_a_little"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/below_layout" />
+        app:layout_constraintTop_toBottomOf="@id/below_layout"
+        android:autoLink="web"/>
 
     <RelativeLayout
         android:id="@+id/below_layout"

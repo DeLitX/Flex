@@ -7,7 +7,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.example.flex.R
-import kotlinx.android.synthetic.main.registration_activity.view.*
 import org.junit.Rule
 import org.junit.Test
 

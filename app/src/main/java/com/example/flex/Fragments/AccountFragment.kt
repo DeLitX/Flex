@@ -40,7 +40,6 @@ open class AccountFragment : Fragment(),
     internal lateinit var v: View
     internal lateinit var mGridRecyclerView: AccountPostGridRecyclerFragment
     internal lateinit var mListRecyclerView: AccountPostListRecyclerFragment
-    internal lateinit var mCurrentRecycler: Fragment
     internal lateinit var mSwitchTab: TabLayout
     internal lateinit var mViewPager: ViewPager2
     lateinit var userName: TextView
@@ -89,7 +88,7 @@ open class AccountFragment : Fragment(),
         return v
     }
 
-    open internal suspend fun setUserLiveData() {
+    internal open suspend fun setUserLiveData() {
         mLiveAccountUser = mAccountViewModel.getAccountUser(
             if (mUser == null) {
                 0
@@ -132,7 +131,7 @@ open class AccountFragment : Fragment(),
         bindNonObligatoryViews()
     }
 
-    open internal fun bindNonObligatoryViews() {
+    internal open fun bindNonObligatoryViews() {
         val mMakeChat: Button = v.findViewById(R.id.button_connect_chat)
         mMakeChat.setOnClickListener {
             val intent = Intent(this.context, ChatActivity::class.java)
@@ -142,9 +141,9 @@ open class AccountFragment : Fragment(),
         }
         val followBtn: Button = v.findViewById(R.id.button_follow)
         followBtn.text = if (mUser!!.isSubscribed) {
-            "Unfollow"
+            getString(R.string.unfollow)
         } else {
-            "Follow"
+            getString(R.string.follow)
         }
         followBtn.setOnClickListener {
             if (!mUser!!.isSubscribed) {
@@ -156,7 +155,7 @@ open class AccountFragment : Fragment(),
     }
 
     private fun follow(button: Button): View.OnClickListener {
-        button.text = "Unfollow"
+        button.text = getString(R.string.unfollow)
         mFollowersCount.text = (mFollowersCount.text.toString().toLong() + 1).toString()
         mAccountViewModel.follow(mUser!!.id)
         return View.OnClickListener {
@@ -165,7 +164,7 @@ open class AccountFragment : Fragment(),
     }
 
     private fun unfollow(button: Button): View.OnClickListener {
-        button.text = "Follow"
+        button.text = getString(R.string.follow)
         mFollowersCount.text = (mFollowersCount.text.toString().toLong() - 1).toString()
         mAccountViewModel.unfollow(mUser!!.id)
         return View.OnClickListener {

@@ -8,15 +8,15 @@
         android:id="@+id/message_sender_avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@id/message_linear_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/message_linear_layout"
-        app:layout_constraintBottom_toBottomOf="@id/message_linear_layout"/>
+        app:layout_constraintTop_toTopOf="@id/message_linear_layout" />
+
     <LinearLayout
         android:id="@+id/message_linear_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/message_sender_avatar"
@@ -28,12 +28,39 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start" />
 
-        <TextView
-            android:id="@+id/message_text"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
             android:background="@drawable/rounded_corners"
-            android:padding="15dp" />
+            android:padding="@dimen/margin_border_a_little">
+
+            <TextView
+                android:id="@+id/message_text"
+                style="@style/Text.Black.Mini"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:autoLink="web"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="1dp"/>
+
+            <TextView
+                android:id="@+id/message_status"
+                style="@style/Text.Gray.Mini"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/message_text" />
+            <TextView
+                android:layout_marginEnd="1dp"
+                android:id="@+id/message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/message_status"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

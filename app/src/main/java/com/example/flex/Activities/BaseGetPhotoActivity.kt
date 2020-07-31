@@ -56,7 +56,7 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
     ) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.isNotEmpty()) {
-                var counter: Int = 0
+                var counter= 0
                 for (i in 0..permissions.size - 1) {
                     val permission = permissions[i]
                     if (android.Manifest.permission.CAMERA == permission) {
@@ -136,7 +136,7 @@ open class BaseGetPhotoActivity : AppCompatActivity(), ReceivedPhoto {
         val name: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        var file: File = File("$storageDir/$name.jpg")
+        val file= File("$storageDir/$name.jpg")
         try {
             file.createNewFile()
         } catch (e: Exception) {

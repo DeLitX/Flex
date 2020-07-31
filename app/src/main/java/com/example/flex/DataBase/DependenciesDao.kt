@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.flex.POJO.UserToChat
-import kotlinx.coroutines.selects.select
 
 @Dao
 interface DependenciesDao {

@@ -1,9 +1,9 @@
 package com.example.flex.ViewModels
 
 import android.app.Application
-import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.flex.Enums.ChatConnectEnum
 import com.example.flex.POJO.Chat
 import com.example.flex.POJO.ChatMessage
 import com.example.flex.POJO.User
@@ -12,10 +12,12 @@ import java.io.File
 class ChatViewModel(private val app: Application) : BaseViewModel(app) {
     val chatId: MutableLiveData<Long>
     val chatCreating:LiveData<Boolean>
+    val chatConnectStatus:LiveData<ChatConnectEnum>
 
     init {
         chatId = mRepository.chatId
         chatCreating=mRepository.chatCreating
+        chatConnectStatus=mRepository.chatConnectStatus
     }
 
     fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {

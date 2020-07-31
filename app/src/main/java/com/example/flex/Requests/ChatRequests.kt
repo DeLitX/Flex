@@ -1,9 +1,9 @@
 package com.example.flex.Requests
 
+import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.MainData
 import com.example.flex.POJO.Chat
 import com.example.flex.POJO.ChatMessage
-import com.example.flex.POJO.User
 import com.example.flex.POJO.UserToChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -15,10 +15,9 @@ import java.io.File
 import java.io.IOException
 import java.net.CookieManager
 import java.net.CookiePolicy
-import java.time.chrono.IsoChronology
 
 class ChatRequests(
-    private val mChatroomInteraction: ChatroomInteraction,
+    private val mChatRoomInteraction: ChatRoomInteraction,
     private val mCsrftoken: String,
     private val mSessionId: String
 ) {
@@ -73,14 +72,15 @@ class ChatRequests(
                                                 userId = value["user_id"].toString().toLong(),
                                                 id = value["msg_id"].toString().toLong(),
                                                 isMy = value["user_id"].toString()
-                                                    .toLong() == myUserId
+                                                    .toLong() == myUserId,
+                                                sentStatus = MessageSentEnum.RECEIVED
                                             )
                                         )
                                 }
                                 if (idOfLast == 0.toLong()) {
-                                    mChatroomInteraction.deleteMessagesFromChat(chatId)
+                                    mChatRoomInteraction.deleteMessagesFromChat(chatId)
                                 }
-                                mChatroomInteraction.saveMessagesToDB(chats)
+                                mChatRoomInteraction.saveMessagesToDB(chats)
                             }
                         }
                     }
@@ -126,7 +126,7 @@ class ChatRequests(
                                         )
                                     )
                                 }
-                                mChatroomInteraction.saveDependenciesToDB(dependencies)
+                                mChatRoomInteraction.saveDependenciesToDB(dependencies)
                             }
                         }
                     }
@@ -137,9 +137,9 @@ class ChatRequests(
     }
 
     suspend fun createGroupChat(users: List<Long>, groupName: String, chatPhoto: File? = null) {
-        mChatroomInteraction.setChatCreating(true)
+        mChatRoomInteraction.setChatCreating(true)
         val linkToAvatar =
-            if (chatPhoto != null) mChatroomInteraction.uploadPhoto(chatPhoto) else Pair("", "")
+            if (chatPhoto != null) mChatRoomInteraction.uploadPhoto(chatPhoto) else Pair("", "")
         val formBody = FormBody.Builder()
             .add("csrfmiddlewaretoken", mCsrftoken)
             .add("group_name", groupName)
@@ -159,7 +159,7 @@ class ChatRequests(
             if (response.isSuccessful) {
                 val body = response.body?.string()
                 if (body != null) {
-                    mChatroomInteraction.saveChatsToDB(
+                    mChatRoomInteraction.saveChatsToDB(
                         listOf(
                             Chat(
                                 id = body.toLong(),
@@ -170,13 +170,11 @@ class ChatRequests(
                         )
                     )
                 }
-            } else {
-
             }
         } catch (e: IOException) {
 
         }
-        mChatroomInteraction.setChatCreating(false)
+        mChatRoomInteraction.setChatCreating(false)
     }
 
     fun getChats() {
@@ -217,7 +215,7 @@ class ChatRequests(
                                         )
                                     )
                             }
-                            mChatroomInteraction.saveChatsToDB(chats)
+                            mChatRoomInteraction.saveChatsToDB(chats)
                         }
                     }
                 }
@@ -228,7 +226,7 @@ class ChatRequests(
 
     private fun usersListToJsonIdList(users: List<Long>): String {
         var result = ""
-        var isFirst: Boolean = true
+        var isFirst = true
         for (i in users) {
             if (!isFirst) {
                 result += " "
@@ -240,7 +238,7 @@ class ChatRequests(
         return result
     }
 
-    interface ChatroomInteraction {
+    interface ChatRoomInteraction {
         fun saveChatsToDB(chats: List<Chat>)
         fun saveMessagesToDB(messages: List<ChatMessage>)
         fun deleteMessagesFromChat(chatId: Long)

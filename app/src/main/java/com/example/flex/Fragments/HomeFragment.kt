@@ -5,9 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
-import com.example.flex.Adapters.HomeViewPagerAdapter
 import com.example.flex.Adapters.ViewPagerAdapter
 import com.example.flex.R
 
@@ -16,7 +14,7 @@ class HomeFragment : Fragment(), FeedFragment.HomeInteraction {
     private var mAdapter: ViewPagerAdapter? = null
     private lateinit var mViewPager: ViewPager2
     private val mFeedFragment: FeedFragment = FeedFragment(this)
-    private val mChatroomFragment: ChatroomFragment = ChatroomFragment()
+    private val mChatroomFragment: ChatRoomFragment = ChatRoomFragment()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,7 +40,7 @@ class HomeFragment : Fragment(), FeedFragment.HomeInteraction {
         mAdapter
     }
 
-    override fun goToChatroom() {
+    override fun goToChatRoom() {
         mViewPager.currentItem = 1
     }
 }

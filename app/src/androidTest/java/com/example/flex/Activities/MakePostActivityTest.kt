@@ -1,6 +1,5 @@
 package com.example.flex.Activities
 
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.Instrumentation
 import android.content.ContentResolver
@@ -16,7 +15,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -24,7 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.example.flex.R
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
 

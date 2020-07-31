@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.flex.POJO.Chat
 import com.example.flex.POJO.User
-import com.example.flex.POJO.UserToChat
 
 @Dao
 interface ChatDao {

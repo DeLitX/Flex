@@ -1,14 +1,11 @@
 package com.example.flex.ViewModels
 
 import android.app.Application
-import android.widget.ImageView
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
-import com.example.flex.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -45,8 +42,8 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
         return mRepository.getPostsForAccount(userId)
     }
 
-    suspend fun getCommentsForPost(postid: Long): LiveData<List<Comment>> {
-        return mRepository.getCommentsForPost(postid)
+    suspend fun getCommentsForPost(postId: Long): LiveData<List<Comment>> {
+        return mRepository.getCommentsForPost(postId)
     }
     fun uploadUserAvatar(file: File){
         mRepository.uploadUserAvatar(file)

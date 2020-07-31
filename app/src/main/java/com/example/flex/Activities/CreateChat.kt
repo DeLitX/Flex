@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.flex.ViewModels.ChatroomViewModel
+import com.example.flex.ViewModels.ChatRoomViewModel
 import com.example.flex.Fragments.ChoosableUsersRecyclerFragment
 import com.example.flex.Fragments.MiniUsersRecyclerFragment
 import com.example.flex.MainData
@@ -21,7 +21,7 @@ class CreateChat : AppCompatActivity(), ChoosableUsersRecyclerFragment.UsersRecy
     private val mChosableUsersRecyclerFragment = ChoosableUsersRecyclerFragment(this)
     private val mMiniUsersRecyclerFragment = MiniUsersRecyclerFragment()
     private lateinit var mFinishButton: FloatingActionButton
-    private lateinit var mViewModel: ChatroomViewModel
+    private lateinit var mViewModel: ChatRoomViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_chat)
@@ -29,7 +29,7 @@ class CreateChat : AppCompatActivity(), ChoosableUsersRecyclerFragment.UsersRecy
             .replace(R.id.users_list, mChosableUsersRecyclerFragment).commit()
         supportFragmentManager.beginTransaction()
             .replace(R.id.choosen_users, mMiniUsersRecyclerFragment).commit()
-        mViewModel = ViewModelProvider(this).get(ChatroomViewModel::class.java)
+        mViewModel = ViewModelProvider(this).get(ChatRoomViewModel::class.java)
         mViewModel.followersList.observe(this, Observer {
             mChosableUsersRecyclerFragment.setRecyclerArray(it)
         })

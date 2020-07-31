@@ -5,16 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flex.POJO.Chat
 import com.example.flex.R
-import com.squareup.picasso.Picasso
 
-class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
-    ListAdapter<Chat, ChatroomAdapter.ChatViewHolder>(object :
+class ChatRoomAdapter(private val mChatRoomInteraction: ChatRoomInteraction) :
+    ListAdapter<Chat, ChatRoomAdapter.ChatViewHolder>(object :
         DiffUtil.ItemCallback<Chat>() {
         override fun areItemsTheSame(oldItem: Chat, newItem: Chat): Boolean {
             return oldItem.id == newItem.id
@@ -27,7 +25,7 @@ class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
 
     }) {
     class ChatViewHolder(
-        private val mChatroomInteraction: ChatroomInteraction,
+        private val mChatRoomInteraction: ChatRoomInteraction,
         private val v: View
     ) : RecyclerView.ViewHolder(v) {
         private val mChatImage: ImageView = v.findViewById(R.id.chat_image)
@@ -37,17 +35,17 @@ class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
 
         init {
             v.setOnClickListener {
-                mChatroomInteraction.enterChat(chatId = mChatId)
+                mChatRoomInteraction.enterChat(chatId = mChatId)
             }
         }
 
         fun bind(chat: Chat) {
             mChatId = chat.id
             if (chat.imageMini.trim().isNotEmpty()) {
-                mChatroomInteraction.downloadPhoto(chat.imageMini,mChatImage)
+                mChatRoomInteraction.downloadPhoto(chat.imageMini,mChatImage)
             } else {
                 if (chat.image.trim().isNotEmpty()) {
-                    mChatroomInteraction.downloadPhoto(chat.image,mChatImage)
+                    mChatRoomInteraction.downloadPhoto(chat.image,mChatImage)
                 }else{
                     mChatImage.setImageResource(R.drawable.ic_launcher_background)
                 }
@@ -60,14 +58,14 @@ class ChatroomAdapter(private val mChatroomInteraction: ChatroomInteraction) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.chat_item, parent, false)
-        return ChatViewHolder(mChatroomInteraction, view)
+        return ChatViewHolder(mChatRoomInteraction, view)
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    interface ChatroomInteraction {
+    interface ChatRoomInteraction {
         fun enterChat(chatId: Long)
         fun downloadPhoto(link:String,photoView:ImageView)
     }
