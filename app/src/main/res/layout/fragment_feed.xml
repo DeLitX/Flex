@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorWhite">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/top_panel"
@@ -20,7 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_chat" />
+            android:src="@drawable/ic_chat"
+            android:contentDescription="@string/go_to_chatroom"/>
     </RelativeLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

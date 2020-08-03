@@ -13,20 +13,25 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ChatUserListRecycler(private val mInteraction: ChatUsersInteraction) : Fragment() {
     private lateinit var v:View
-   val adapter=ChatUsersAdapter(mInteraction)
+   val adapter:ChatUsersAdapter = ChatUsersAdapter(mInteraction)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         v=inflater.inflate(R.layout.fragment_chat_user_list_recycler, container, false)
-        val recycler: RecyclerView =v.findViewById(R.id.recycler)
-        recycler.layoutManager= LinearLayoutManager(v.context)
+
+        return v
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val recycler: RecyclerView =view.findViewById(R.id.recycler)
+        recycler.layoutManager= LinearLayoutManager(view.context)
         recycler.adapter=adapter
-        val addButton:FloatingActionButton=v.findViewById(R.id.add_fab)
+        val addButton:FloatingActionButton=view.findViewById(R.id.add_fab)
         addButton.setOnClickListener {
             mInteraction.addUser()
         }
-        return v
     }
     interface ChatUsersInteraction:ChatUsersAdapter.ChatUsersAdapterInteraction{
         fun addUser()

@@ -52,7 +52,7 @@ class ChatAdapter(private val mChatInteraction: ChatInteraction) :
         init {
             userAvatar.setOnClickListener {
                 if (user != null) {
-                    //TODO
+                    mChatInteraction.goToUser(user!!)
                 }
             }
         }
@@ -131,5 +131,6 @@ class ChatAdapter(private val mChatInteraction: ChatInteraction) :
     interface ChatInteraction {
         fun downloadPhotoByUrl(url: String, photoView: ImageView)
         suspend fun getUserById(id: Long): User
+        fun goToUser(user:User)
     }
 }

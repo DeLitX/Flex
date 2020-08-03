@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.flex.MainData
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -46,7 +47,7 @@ class UploadFileRequests(
             .addFormDataPart(
                 "img",
                 file.name,
-                RequestBody.create("image/jpg".toMediaTypeOrNull(), file)
+                file.asRequestBody("image/jpg".toMediaTypeOrNull())
             )
             .addFormDataPart("csrfmiddlewaretoken", mCsrftoken)
             //.addFormDataPart("description", description)
@@ -85,7 +86,7 @@ class UploadFileRequests(
             .addFormDataPart(
                 "img",
                 file.name,
-                RequestBody.create("image/jpg".toMediaTypeOrNull(), file)
+                file.asRequestBody("image/jpg".toMediaTypeOrNull())
             )
             .addFormDataPart("csrfmiddlewaretoken", mCsrftoken)
             .addFormDataPart("description", description)
@@ -135,7 +136,7 @@ class UploadFileRequests(
             .addFormDataPart(
                 "avatar",
                 file.name,
-                RequestBody.create("image/jpg".toMediaTypeOrNull(), file)
+                file.asRequestBody("image/jpg".toMediaTypeOrNull())
             )
             .addFormDataPart("csrfmiddlewaretoken", mCsrftoken)
             .build()

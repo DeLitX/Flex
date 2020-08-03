@@ -260,29 +260,6 @@ class Repository(private val application: Application) : UserRequests.UserReques
     }
 
     fun downloadPhoto(link: String, photo: ImageView) {
-        /*val pair = getCSRFTokenAndSessionId()
-        val httpCacheDirectory = File(application.applicationContext.cacheDir, "http-cache")
-        val cacheSize: Long = 10 * 1024 * 1024
-        val cache = Cache(httpCacheDirectory, cacheSize)
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(PicassoInterceptor(pair.first, pair.second))
-            .cache(cache)
-            .build()
-        val picasso = Picasso.Builder(application.applicationContext)
-            .downloader(
-                OkHttp3Downloader(
-                    okHttpClient
-                )
-            )
-            .indicatorsEnabled(BuildConfig.DEBUG)
-            .build()
-        val urlHttp = HttpUrl.Builder().scheme("https")
-            .host(MainData.BASE_URL)
-            .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
-            .addPathSegment(MainData.VIEW_PHOTO)
-            .addQueryParameter("img", link)
-            .build()
-        picasso.load(urlHttp.toString()).into(photo)*/
         //TODO cache images
 
         CoroutineScope(IO).launch {

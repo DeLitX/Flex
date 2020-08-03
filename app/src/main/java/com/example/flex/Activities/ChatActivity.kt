@@ -159,7 +159,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
                                 mAdapter.getItemByPosition(mAdapter.itemCount - 1).id
                             )
                         }*/
-                        //TODO
+                        //TODO load messages to
                     }
                 }
             }

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/circled_corners"
-    android:elevation="10dp">
+    android:elevation="10dp"
+    android:layout_margin="1dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chat_image"

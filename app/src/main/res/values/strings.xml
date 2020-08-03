@@ -6,7 +6,6 @@
     <string name="email">E-mail</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_in">Sign in</string>
-    <string name="more_menu_icon">\uf142</string>
     <string name="comment_icon">\uf27a</string>
     <string name="fire_icon">\uf06d</string>
     <string name="share_icon">\uf1e0</string>
@@ -29,7 +28,6 @@
     <string name="list">List</string>
     <string name="registration">Registration</string>
     <string name="logout">Logout</string>
-    <string name="checklog">Checklog</string>
     <string name="change_pass">Change password</string>
     <string name="make_post">Make post</string>
     <string name="write_message">Write your message</string>
@@ -54,4 +52,11 @@
     <string name="sent">Sent</string>
     <string name="not_sent">Not sent</string>
     <string name="failed_send">Failed to send</string>
+    <string name="chat_settings">Chat settings</string>
+    <string name="go_to_chatroom">Go to chat room button</string>
+    <string name="smth_went_wrong">Something went wrong.Please,try again.</string>
+    <string name="we_sent_letter">We sent a letter on your Email.Please follow the link and then sign in</string>
+    <string name="passwords_different">Passwords are not identical</string>
+    <string name="nick_nust_not_empty">Nickname mustn\'t be empty</string>
+    <string name="email_must_finish">Email must finish by @gmail.com</string>
 </resources>

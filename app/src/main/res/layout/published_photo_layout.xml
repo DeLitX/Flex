@@ -78,9 +78,7 @@
             android:layout_alignBaseline="@id/fire_icon"
             android:layout_alignParentTop="true"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/fire_icon"
-            android:layout_toRightOf="@id/fire_icon"
             android:textSize="20sp" />
 
         <TextView
@@ -90,9 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
             android:layout_toEndOf="@id/fire_count"
-            android:layout_toRightOf="@id/fire_count"
             android:text="@string/comment_icon"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="30sp" />
@@ -105,9 +101,7 @@
             android:layout_alignBaseline="@id/fire_icon"
             android:layout_alignParentTop="true"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/comments_icon"
-            android:layout_toRightOf="@id/comments_icon"
             android:textSize="20sp" />
 
         <TextView
@@ -117,9 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
             android:layout_toEndOf="@id/comments_count"
-            android:layout_toRightOf="@id/comments_count"
             android:text="@string/share_icon"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="30sp" />
@@ -132,9 +124,7 @@
             android:layout_alignBaseline="@id/fire_icon"
             android:layout_alignParentTop="true"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/share_icon"
-            android:layout_toRightOf="@id/share_icon"
             android:textSize="20sp" />
 
 

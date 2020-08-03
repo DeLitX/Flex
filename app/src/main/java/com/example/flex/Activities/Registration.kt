@@ -58,9 +58,9 @@ class Registration : AppCompatActivity() {
         })
         mViewModel.isRegistSucceed.observe(this, Observer {
             if(it==false){
-                mTextBelowRegistration.text="Something went wrong.Please,try again."
+                mTextBelowRegistration.text=getString(R.string.smth_went_wrong)
             }else if(it==true){
-                   mTextBelowRegistration.text= "We sent a letter on your Email.Please follow the link and then sign in"
+                   mTextBelowRegistration.text= getString(R.string.we_sent_letter)
             }else{
                 mTextBelowRegistration.text=""
             }
@@ -81,11 +81,11 @@ class Registration : AppCompatActivity() {
                 )
 
             }else if(mPassword.text.toString().trim() != mRepeatPassword.text.toString().trim()){
-                mTextBelowRegistration.text= "Passwords are not identical"
+                mTextBelowRegistration.text= getString(R.string.passwords_different)
             }else if(mLogin.text.toString().trim() == ""){
-                mTextBelowRegistration.text="Nickname mustn't be empty"
+                mTextBelowRegistration.text=getString(R.string.nick_nust_not_empty)
             }else{
-                mTextBelowRegistration.text="Email must finish by @gmail.com"
+                mTextBelowRegistration.text=getString(R.string.email_must_finish)
             }
         }
     }

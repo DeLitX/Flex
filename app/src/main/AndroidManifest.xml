@@ -22,7 +22,7 @@
 
         <activity android:name=".Activities.CompleteCreateChat" />
         <activity android:name=".Activities.CreateChat" />
-        <activity android:name=".Activities.ChatActivity" />
+        <activity android:name=".Activities.ChatActivity"/>
 
         <uses-library
             android:name="android.test.runner"
