@@ -33,7 +33,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
     private val mChatMessageDao: ChatMessageDao
     private val mChatWebsocket: ChatWebsocket = makeChatWebsocket()
     private val mChatDao: ChatDao
-    private val mDependenciesDao:DependenciesDao
+    private val mDependenciesDao: DependenciesDao
     val mainUser: LiveData<User>
     var searchResult: MutableLiveData<List<User>>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
@@ -47,10 +47,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
     val followersList: LiveData<List<User>>
     val isRegistSucceed: MutableLiveData<Boolean?>
     val isFollowersAvailable: MutableLiveData<Boolean?>
-    val chatCreating:MutableLiveData<Boolean>
-    val errorText:MutableLiveData<String?>
-    val userGoTo:MutableLiveData<User?>
-    val chatConnectStatus:MutableLiveData<ChatConnectEnum>
+    val chatCreating: MutableLiveData<Boolean>
+    val errorText: MutableLiveData<String?>
+    val userGoTo: MutableLiveData<User?>
+    val chatConnectStatus: MutableLiveData<ChatConnectEnum>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -58,7 +58,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
         mPosts = postDao.getSortedPosts()
         mUserDao = postDatabase.getUserDao()
         mChatMessageDao = postDatabase.getChatMessageDao()
-        mDependenciesDao=postDatabase.getDependenciesDao()
+        mDependenciesDao = postDatabase.getDependenciesDao()
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         mainUser = mUserDao.getUser(sharedPreferences.getLong(MainData.YOUR_ID, 0))
@@ -77,24 +77,35 @@ class Repository(private val application: Application) : UserRequests.UserReques
         followersList = mUserDao.getFollowingUsers()
         isRegistSucceed = MutableLiveData(null)
         isFollowersAvailable = MutableLiveData(null)
-        chatCreating= MutableLiveData(false)
-        errorText= MutableLiveData(null)
-        userGoTo=MutableLiveData(null)
-        chatConnectStatus= MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
+        chatCreating = MutableLiveData(false)
+        errorText = MutableLiveData(null)
+        userGoTo = MutableLiveData(null)
+        chatConnectStatus = MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
     }
-    fun setGoToUser(user:User?){
+
+    fun refreshUsersByIds(ids: List<Long>) {
+        CoroutineScope(IO).launch {
+            makeUserRequests().refreshUsersByIds(ids)
+        }
+    }
+
+    fun setGoToUser(user: User?) {
         userGoTo.postValue(user)
     }
-    fun getChatUsers(chatId: Long):LiveData<List<User>>{
+
+    fun getChatUsers(chatId: Long): LiveData<List<User>> {
         return mChatDao.getUsersOfChat(chatId)
     }
-    fun refreshChatUsers(chatId: Long){
+
+    fun refreshChatUsers(chatId: Long) {
         makeChatRequest().refreshChatUsers(chatId)
     }
-    suspend fun getChat(chatId: Long):Chat?{
+
+    suspend fun getChat(chatId: Long): Chat? {
         return mChatDao.getChat(chatId)
     }
-    fun testNotification(){
+
+    fun testNotification() {
         makeUserRequests().testNotification()
     }
 
@@ -117,12 +128,14 @@ class Repository(private val application: Application) : UserRequests.UserReques
     fun createChat(userId: Long) {
         mChatWebsocket.createChat(userId)
     }
+
     fun createChat(users: MutableList<Long>, chatName: String) {
         CoroutineScope(IO).launch {
             users.add(getYourId())
             makeChatRequest().createGroupChat(users, chatName)
         }
     }
+
     fun createChat(users: MutableList<Long>, chatName: String, chatPhoto: File) {
         CoroutineScope(IO).launch {
             users.add(getYourId())
@@ -721,6 +734,11 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     override fun saveDependenciesToDB(dependencies: List<UserToChat>) {
         mDependenciesDao.insert(dependencies)
+        val ids:MutableList<Long> = mutableListOf()
+        for(i in dependencies){
+            ids.add(i.userId)
+        }
+        refreshUsersByIds(ids)
     }
 
 

@@ -10,13 +10,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import okhttp3.*
 import java.io.IOException
-import java.net.CookieManager
-import java.net.CookiePolicy
 import java.net.HttpCookie
 
-class RegistRequests(private val mRegistRequestInteraction: RegistRequestInteraction) {
-    val cookieManager = CookieManager()
-    private val mClient: OkHttpClient
+class RegistRequests(private val mRegistRequestInteraction: RegistRequestInteraction):BaseRequestFunctionality() {
     private val mHandler = Handler(Looper.getMainLooper())
     private var mRunnable: Runnable? = null
     private var mSessionId: String
@@ -30,14 +26,10 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
     init {
         this.mCsrftoken = ""
         this.mSessionId = ""
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        mClient = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
     }
 
     fun stopRequests() {
-        for (call in mClient.dispatcher.queuedCalls()) {
+        for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_LOGIN ||
                 call.request().tag() == MainData.TAG_LOGOUT ||
                 call.request().tag() == MainData.TAG_REGISTER
@@ -45,7 +37,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                 call.cancel()
             }
         }
-        for (call in mClient.dispatcher.runningCalls()) {
+        for (call in client.dispatcher.runningCalls()) {
             if (call.request().tag() == MainData.TAG_LOGIN ||
                 call.request().tag() == MainData.TAG_LOGOUT ||
                 call.request().tag() == MainData.TAG_REGISTER
@@ -70,7 +62,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .build()
 
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
         mRegistRequestInteraction.setLoginUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -111,7 +103,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build()
 
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -146,7 +138,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build()
 
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -178,7 +170,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             .post(formBody)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .build()
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
         mRegistRequestInteraction.setRegisterUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

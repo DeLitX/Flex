@@ -10,31 +10,20 @@ import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
-import java.net.CookieManager
-import java.net.CookiePolicy
+import java.lang.Exception
 
 class UserRequests(
     private val mUserRequestsInteraction: UserRequestsInteraction,
     private val csrftoken: String,
     private val sessionId: String
-) {
-    private val client: OkHttpClient
-    private val cookieManager = CookieManager()
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
-    }
-    fun testNotification(){
+) : BaseRequestFunctionality() {
+    fun testNotification() {
         val urlHttp = HttpUrl.Builder().scheme("https")
-                .host(MainData.BASE_URL)
-                .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
-                .addPathSegment("test_fcm")
-                .build()
+            .host(MainData.BASE_URL)
+            .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
+            .addPathSegment("test_fcm")
+            .build()
         val request = Request.Builder().url(urlHttp)
-            .tag(MainData.TAG_GET_FOLLOWING_COUNT)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
@@ -68,7 +57,6 @@ class UserRequests(
             .add("csrfmiddlewaretoken", csrftoken)
             .build()
         val request = Request.Builder()
-            .tag(MainData.TAG_VIEW_ACC)
             .url("https://${MainData.BASE_URL}/${MainData.URL_PREFIX_USER_PROFILE}/${MainData.VIEW_ACC}")
             .post(formBody)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
@@ -114,22 +102,6 @@ class UserRequests(
                                 listOfPosts,
                                 idOfUser.toString().toLong()
                             )
-                            /*var user: User = if (actualUser != null) {
-                                User(
-                                    id = idOfUser.toString().toLong(),
-                                    name = nameOfUser.toString(),
-                                    followingCount = actualUser.followingCount,
-                                    followersCount = actualUser.followersCount,
-                                    imageUrl = actualUser.imageUrl,
-                                    isSubscribed = isSubscribed.toString().toBoolean()
-                                )
-                            } else {
-                                User(
-                                    id = idOfUser.toString().toLong(),
-                                    isSubscribed = isSubscribed.toString().toBoolean(),
-                                    name = nameOfUser.toString()
-                                )
-                            }*/
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
@@ -141,9 +113,49 @@ class UserRequests(
         })
     }
 
+    suspend fun refreshUsersByIds(ids: List<Long>) {
+        val urlHttp = HttpUrl.Builder().scheme("https")
+            .host(MainData.BASE_URL)
+            .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
+            .addPathSegment(MainData.USERNAME_LIST)
+            .addQueryParameter("id_list", longsListToJsonIdList(ids))
+            .build()
+        val request = Request.Builder().url(urlHttp)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
+            .build()
+        val call = client.newCall(request)
+        val response = call.execute()
+        if (response.isSuccessful) {
+            val body = response.body
+            if (body != null) {
+                try {
+                    val bodyString = body.string()
+                    val jsonObject = JSONObject(bodyString)
+                    val jsonArray = jsonObject["user_list"]
+                    if (jsonArray is JSONArray) {
+                        val users: MutableList<User> = mutableListOf()
+                        val length = jsonArray.length()
+                        for (i in 0 until length) {
+                            users.add(
+                                User(
+                                    id = ids[i],
+                                    name = jsonArray.get(i) as String
+                                )
+                            )
+                        }
+                        //I know that here already saved users are being overrided by this dummies
+                        mUserRequestsInteraction.saveUsersToDB(users)
+                    }
+                } catch (e: Exception) {
+                    mUserRequestsInteraction.setErrorText(e.toString())
+                }
+            }
+        }
+    }
+
     fun viewFollowing() {
         val request = Request.Builder()
-            .tag(MainData.TAG_VIEW_ACC)
             .url("https://${MainData.BASE_URL}/${MainData.URL_PREFIX_USER_PROFILE}/${MainData.VIEW_SUBSCRIBES}")
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=${csrftoken}; sessionid=${sessionId}")
@@ -179,23 +191,6 @@ class UserRequests(
                                 }
                                 mUserRequestsInteraction.saveUsersToDB(listOfUsers)
                             }
-
-                            /*var user: User = if (actualUser != null) {
-                                User(
-                                    id = idOfUser.toString().toLong(),
-                                    name = nameOfUser.toString(),
-                                    followingCount = actualUser.followingCount,
-                                    followersCount = actualUser.followersCount,
-                                    imageUrl = actualUser.imageUrl,
-                                    isSubscribed = isSubscribed.toString().toBoolean()
-                                )
-                            } else {
-                                User(
-                                    id = idOfUser.toString().toLong(),
-                                    isSubscribed = isSubscribed.toString().toBoolean(),
-                                    name = nameOfUser.toString()
-                                )
-                            }*/
                         }
                     }
                 } else if (response.code == MainData.ERR_403) {
@@ -223,7 +218,6 @@ class UserRequests(
                 .build()
         }
         val request = Request.Builder().url(urlHttp)
-            .tag(MainData.TAG_GET_FOLLOWING_COUNT)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
@@ -272,7 +266,6 @@ class UserRequests(
             .addQueryParameter("id", userId.toString())
             .build()
         val request = Request.Builder().url(urlHttp)
-            .tag(MainData.TAG_FOLLOW)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
@@ -303,7 +296,6 @@ class UserRequests(
             .addQueryParameter("id", userId.toString())
             .build()
         val request = Request.Builder().url(urlHttp)
-            .tag(MainData.TAG_FOLLOW)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
@@ -335,7 +327,7 @@ class UserRequests(
         fun savePostsToDb(posts: List<Post>, idOfUser: Long)
         fun updateUserInDb(user: User)
         fun saveUsersToDB(users: List<User>)
-        fun setErrorText(text:String?)
+        fun setErrorText(text: String?)
     }
 
 }

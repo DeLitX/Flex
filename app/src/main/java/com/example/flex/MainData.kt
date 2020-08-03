@@ -64,4 +64,5 @@ object MainData {
     const val CREATE_GROUP_CHAT="create_group_chat"
     const val GET_CHAT_MEMBERS="get_chat_members"
     const val EXTRA_GO_TO_USER_ID="extra go to user id"
+    const val USERNAME_LIST="username_list"
 }

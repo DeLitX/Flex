@@ -20,16 +20,7 @@ class ChatRequests(
     private val mChatRoomInteraction: ChatRoomInteraction,
     private val mCsrftoken: String,
     private val mSessionId: String
-) {
-    private val client: OkHttpClient
-    private val cookieManager = CookieManager()
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
-    }
+): BaseRequestFunctionality() {
 
     fun loadMessages(chatId: Long, idOfLast: Long, myUserId: Long) {
         val formBody = FormBody.Builder()
@@ -144,7 +135,7 @@ class ChatRequests(
             .add("csrfmiddlewaretoken", mCsrftoken)
             .add("group_name", groupName)
             .add("members_count", users.size.toString())
-            .add("members_id", usersListToJsonIdList(users))
+            .add("members_id", longsListToJsonIdList(users))
             .add("ava_src", linkToAvatar.first)
             .build()
         val request = Request.Builder()
@@ -223,21 +214,6 @@ class ChatRequests(
 
         })
     }
-
-    private fun usersListToJsonIdList(users: List<Long>): String {
-        var result = ""
-        var isFirst = true
-        for (i in users) {
-            if (!isFirst) {
-                result += " "
-            } else {
-                isFirst = false
-            }
-            result += i
-        }
-        return result
-    }
-
     interface ChatRoomInteraction {
         fun saveChatsToDB(chats: List<Chat>)
         fun saveMessagesToDB(messages: List<ChatMessage>)

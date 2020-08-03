@@ -18,17 +18,7 @@ class SearchRequests(
     private val mSearchInteraction: SearchInteraction,
     private val mCsrftoken: String,
     private val mSessionId: String
-) {
-    private val client: OkHttpClient
-    private val cookieManager = CookieManager()
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
-    }
-
+):BaseRequestFunctionality() {
     fun stopRequests() {
         for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_SEARCH) {

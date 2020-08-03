@@ -21,19 +21,7 @@ class PhotoRequests(
     private val csrftoken: String,
     private val sessionId: String,
     private val cache: Cache
-) {
-    private val cookieManager = CookieManager()
-    private val client: OkHttpClient
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .addNetworkInterceptor(CacheInterceptor())
-            .cache(cache)
-            .build()
-    }
-
+):BaseRequestFunctionality() {
     fun stopRequests() {
         for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_DOWNLOAD_PHOTO ||

@@ -17,24 +17,14 @@ import java.util.*
 class UploadFileRequests(
     private val mIsMustSignIn: MutableLiveData<Boolean?>,
     private val mCsrftoken: String, private val mSessionId: String
-) {
-    private val mCookieManager = CookieManager()
-    private val mClient: OkHttpClient
-
-    init {
-        mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        mClient = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(mCookieManager))
-            .build()
-    }
-
+) :BaseRequestFunctionality(){
     fun stopRequests() {
-        for (call in mClient.dispatcher.queuedCalls()) {
+        for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_UPLOAD) {
                 call.cancel()
             }
         }
-        for (call in mClient.dispatcher.runningCalls()) {
+        for (call in client.dispatcher.runningCalls()) {
             if (call.request().tag() == MainData.TAG_UPLOAD) {
                 call.cancel()
             }
@@ -59,7 +49,7 @@ class UploadFileRequests(
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
         try {
             val response = call.execute()
             if (response.isSuccessful) {
@@ -98,7 +88,7 @@ class UploadFileRequests(
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
         Log.d("timeSending", "${Calendar.getInstance().timeInMillis}")
 
         call.enqueue(object : Callback {
@@ -147,7 +137,7 @@ class UploadFileRequests(
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
             .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
             .build()
-        val call = mClient.newCall(request)
+        val call = client.newCall(request)
         Log.d("timeSending", "${Calendar.getInstance().timeInMillis}")
 
         call.enqueue(object : Callback {

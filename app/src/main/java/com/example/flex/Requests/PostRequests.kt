@@ -17,18 +17,7 @@ class PostRequests(
     private val mPostRequestsInteraction: PostRequestsInteraction,
     private var csrftoken: String,
     private var sessionId: String
-) {
-    private val cookieManager = CookieManager()
-    private val client: OkHttpClient
-
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
-    }
-
+):BaseRequestFunctionality() {
     fun stopRequests() {
         for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_HOME ||

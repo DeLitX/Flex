@@ -10,16 +10,7 @@ import java.io.IOException
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-class ForgotPassRequests {
-    private val client: OkHttpClient
-    private val cookieManager = CookieManager()
-
-    init {
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        client = OkHttpClient.Builder()
-            .cookieJar(JavaNetCookieJar(cookieManager))
-            .build()
-    }
+class ForgotPassRequests:BaseRequestFunctionality() {
     fun stopRequests(){
         for(call in client.dispatcher.queuedCalls()){
             if(call.request().tag()==MainData.TAG_CHANGE_PASS||
