@@ -12,13 +12,18 @@ import okhttp3.*
 import java.io.IOException
 import java.net.HttpCookie
 
-class RegistRequests(private val mRegistRequestInteraction: RegistRequestInteraction):BaseRequestFunctionality() {
+class RegistRequests(private val mRegistRequestInteraction: RegistRequestInteraction) :
+    BaseRequestFunctionality() {
     private val mHandler = Handler(Looper.getMainLooper())
     private var mRunnable: Runnable? = null
     private var mSessionId: String
     private var mCsrftoken: String
 
-    constructor(mRegistRequestInteraction: RegistRequestInteraction,csrftoken: String, sessionId: String) : this(mRegistRequestInteraction) {
+    constructor(
+        mRegistRequestInteraction: RegistRequestInteraction,
+        csrftoken: String,
+        sessionId: String
+    ) : this(mRegistRequestInteraction) {
         this.mCsrftoken = csrftoken
         this.mSessionId = sessionId
     }
@@ -78,10 +83,12 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
                         mRegistRequestInteraction.setYourId(body.toLong())
                         mRegistRequestInteraction.setMustSignIn(false)
                         mRegistRequestInteraction.setLoginUpdating(false)
-                        mRegistRequestInteraction.addUserToDB(User(
-                            id=body.toLong(),
-                            name = login
-                        ))
+                        mRegistRequestInteraction.addUserToDB(
+                            User(
+                                id = body.toLong(),
+                                name = login
+                            )
+                        )
                     }
                 } else {
                     mRegistRequestInteraction.setLoginUpdating(false)
@@ -95,7 +102,9 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         val urlHttp = HttpUrl.Builder().scheme("https")
             .host(MainData.BASE_URL)
             .addPathSegment(MainData.URL_PREFIX_ACC_BASE)
-            .addPathSegment(MainData.LOGOUT).build()
+            .addPathSegment(MainData.LOGOUT)
+            .addQueryParameter("token", FirebaseInstanceId.getInstance().token ?: "-1")
+            .build()
         val request = Request.Builder().url(urlHttp)
             .tag(MainData.TAG_LOGOUT)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
@@ -198,10 +207,10 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         fun setCSRFToken(csrftoken: String)
         fun setSessionId(sessionId: String)
         fun setYourId(id: Long)
-        fun setMustSignIn(value:Boolean)
-        fun setLoginUpdating(value:Boolean)
-        fun setRegisterUpdating(value:Boolean)
-        fun setRegistSucceed(value:Boolean?)
+        fun setMustSignIn(value: Boolean)
+        fun setLoginUpdating(value: Boolean)
+        fun setRegisterUpdating(value: Boolean)
+        fun setRegistSucceed(value: Boolean?)
         fun addUserToDB(user: User)
     }
 }

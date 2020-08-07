@@ -83,10 +83,18 @@ class Repository(private val application: Application) : UserRequests.UserReques
         chatConnectStatus = MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
     }
 
+    fun addUsersToChat(ids: List<Long>, chatId: Long) {
+        makeChatRequest().addUsersToChat(ids, chatId)
+    }
+
     fun refreshUsersByIds(ids: List<Long>) {
         CoroutineScope(IO).launch {
             makeUserRequests().refreshUsersByIds(ids)
         }
+    }
+
+    fun removeUsersFromChat(ids: List<Long>, chatId: Long) {
+        makeChatRequest().removeUsersFromChat(ids, chatId)
     }
 
     fun setGoToUser(user: User?) {
@@ -733,12 +741,18 @@ class Repository(private val application: Application) : UserRequests.UserReques
     }
 
     override fun saveDependenciesToDB(dependencies: List<UserToChat>) {
+        //TODO fix bug with odd dependencies after request(when I add dependencies which were not in response)
+
         mDependenciesDao.insert(dependencies)
-        val ids:MutableList<Long> = mutableListOf()
-        for(i in dependencies){
+        val ids: MutableList<Long> = mutableListOf()
+        for (i in dependencies) {
             ids.add(i.userId)
         }
         refreshUsersByIds(ids)
+    }
+
+    override fun removeDependencyFromDB(dependencies: List<UserToChat>) {
+        mDependenciesDao.delete(dependencies)
     }
 
 

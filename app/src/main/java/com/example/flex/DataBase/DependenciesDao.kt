@@ -1,9 +1,6 @@
 package com.example.flex.DataBase
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.flex.POJO.UserToChat
 
 @Dao
@@ -17,4 +14,6 @@ interface DependenciesDao {
     fun getIdsOfUsersOfChat(chatId:Long):List<Long>
     @Query("delete from user_to_chat")
     fun deleteDependencies()
+    @Delete
+    fun delete(dependencies:List<UserToChat>)
 }

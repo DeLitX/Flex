@@ -1,10 +1,12 @@
 package com.example.flex.Activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -199,7 +201,6 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
                 mViewModel.loadMessages(mChatId, 0)
             }
         } else {
-            val context = this.applicationContext
             mChatId = chatId
             mViewModel.connectChat(chatId)
             isConnected = true
@@ -250,11 +251,24 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
     }
 
     override fun addUser() {
-        //TODO
+        val intent=Intent(this,AddUsersToChat::class.java)
+        intent.putExtra(MainData.EXTRA_CHAT_ID,mChatId)
+        startActivity(intent)
     }
 
     override fun removeUser(userId: Long) {
-        //TODO
+        val builder=AlertDialog.Builder(this)
+        builder.setCancelable(true)
+            .setPositiveButton(R.string.yes) { dialogInterface, i ->
+                mViewModel.removeUsersFromChat(listOf(userId),mChatId)
+                dialogInterface.cancel()
+            }
+            .setNegativeButton(R.string.no) { dialogInterface, i ->
+                dialogInterface.cancel()
+            }
+            .setTitle(R.string.do_you_want_delete_user_from_chat)
+        val alert=builder.create()
+        alert.show()
     }
 
     override fun upgradeUser(userId: Long) {

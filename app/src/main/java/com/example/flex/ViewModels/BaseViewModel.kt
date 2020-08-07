@@ -11,7 +11,9 @@ open class BaseViewModel(app:Application):AndroidViewModel(app) {
     internal val mRepository:Repository= Repository(app)
     val isMustSignIn: LiveData<Boolean?>
     val userGoTo:LiveData<User?>
+    val followersList: LiveData<List<User>>
     init {
+        followersList = mRepository.followersList
         userGoTo=mRepository.userGoTo
         isMustSignIn=mRepository.isMustSignIn
     }
@@ -20,5 +22,9 @@ open class BaseViewModel(app:Application):AndroidViewModel(app) {
     }
     fun setGoToUser(user:User?){
         mRepository.setGoToUser(user)
+    }
+
+    fun refreshFollowersList() {
+        mRepository.refreshFollowersList()
     }
 }

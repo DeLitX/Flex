@@ -73,8 +73,8 @@ class CompleteCreateChat : BaseGetPhotoActivity(), BottomAddPhotoDialog.PhotoInt
         }
     }
 
-    override fun onGetPhotoFromGallery(image: Bitmap) {
-        mAvatar.setImageBitmap(image)
+    override fun onGetPhotoFromGallery(photo: Bitmap) {
+        mAvatar.setImageBitmap(photo)
     }
 
     override fun onTakePhoto(imagePath: String, imageUri: Uri) {

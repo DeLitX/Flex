@@ -175,7 +175,7 @@ class UserRequests(
                             val jsonArray = jsonObject["response"]
                             if (jsonArray is JSONArray) {
                                 val listOfUsers = mutableListOf<User>()
-                                val length = jsonObject.length()
+                                val length = jsonArray.length()
                                 for (i in 0 until length) {
                                     val value = jsonArray[i]
                                     if (value is JSONObject) {

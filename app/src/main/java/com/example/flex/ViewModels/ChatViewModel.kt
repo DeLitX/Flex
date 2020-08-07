@@ -19,6 +19,12 @@ class ChatViewModel(private val app: Application) : BaseViewModel(app) {
         chatCreating=mRepository.chatCreating
         chatConnectStatus=mRepository.chatConnectStatus
     }
+    fun removeUsersFromChat(ids: List<Long>, chatId: Long){
+        mRepository.removeUsersFromChat(ids,chatId)
+    }
+    fun addUsersToChat(ids:List<Long>,chatId:Long){
+        mRepository.addUsersToChat(ids,chatId)
+    }
 
     fun getChatMessages(chatId: Long): LiveData<List<ChatMessage>> {
         return mRepository.getChatMessages(chatId)

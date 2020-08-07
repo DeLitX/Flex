@@ -1,5 +1,7 @@
 package com.example.flex.Websockets
 
+import android.os.Handler
+import androidx.core.os.postDelayed
 import com.example.flex.Enums.ChatConnectEnum
 import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.MainData
@@ -26,6 +28,7 @@ class ChatWebsocket(
     var isFirst: Boolean = true
     private var mWebSocket: WebSocket? = null
     private var mFailedToConnect: Int = 0
+
     fun connectChat(chatId: Long, yourUserId: Long) {
         val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
         setThisChatId(chatId)
@@ -72,21 +75,17 @@ class ChatWebsocket(
                 isFirst = true
                 if (mFailedToConnect < 10) {
                     connectWebsocket(cookie)
-                }else{
+                } else {
                     mChatInteraction.setConnectToChat(ChatConnectEnum.FAILED_CONNECT)
                 }
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                if (true) {
-
-                }
+                mChatInteraction.setConnectToChat(ChatConnectEnum.NOT_CONNECTED)
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                if (true) {
-
-                }
+                mChatInteraction.setConnectToChat(ChatConnectEnum.NOT_CONNECTED)
             }
         })
     }
@@ -204,5 +203,5 @@ interface ChatInteraction {
     fun setChatId(chatId: Long)
     fun setChatAvatar(chatId: Long, avatarLink: String)
     fun clearChat(chatId: Long)
-    fun setConnectToChat(value:ChatConnectEnum)
+    fun setConnectToChat(value: ChatConnectEnum)
 }

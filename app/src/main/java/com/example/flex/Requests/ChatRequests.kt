@@ -1,5 +1,6 @@
 package com.example.flex.Requests
 
+import android.util.Log
 import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.MainData
 import com.example.flex.POJO.Chat
@@ -13,14 +14,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
-import java.net.CookieManager
-import java.net.CookiePolicy
 
 class ChatRequests(
     private val mChatRoomInteraction: ChatRoomInteraction,
     private val mCsrftoken: String,
     private val mSessionId: String
-): BaseRequestFunctionality() {
+) : BaseRequestFunctionality() {
 
     fun loadMessages(chatId: Long, idOfLast: Long, myUserId: Long) {
         val formBody = FormBody.Builder()
@@ -75,6 +74,85 @@ class ChatRequests(
                             }
                         }
                     }
+                }
+            }
+
+        })
+    }
+
+    fun removeUsersFromChat(ids: List<Long>, chatId: Long) {
+        val usersId=longsListToJsonIdList(ids)
+        val formBody = FormBody.Builder()
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .add("chat_id", chatId.toString())
+            .add("users_id", usersId)
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.REMOVE_FROM_CHAT}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        Log.d("removeUsersFromChat","start")
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.d("removeUsersFromChat","successful")
+                    val dependencies = mutableListOf<UserToChat>()
+                    for (i in ids) {
+                        dependencies.add(
+                            UserToChat(
+                                chatId = chatId,
+                                userId = i
+                            )
+                        )
+                    }
+                    mChatRoomInteraction.removeDependencyFromDB(dependencies)
+                }
+                Log.d("removeUsersFromChat", response.code.toString())
+            }
+
+        })
+    }
+
+    fun addUsersToChat(ids: List<Long>, chatId: Long) {
+        val usersId=longsListToJsonIdList(ids)
+        val formBody = FormBody.Builder()
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .add("chat_id", chatId.toString())
+            .add("users_id", usersId)
+            .build()
+        val request = Request.Builder()
+            .url(
+                "https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.ADD_TO_CHAT}"
+            )
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val dependencies = mutableListOf<UserToChat>()
+                    for (i in ids) {
+                        dependencies.add(
+                            UserToChat(
+                                chatId = chatId,
+                                userId = i
+                            )
+                        )
+                    }
+                    mChatRoomInteraction.saveDependenciesToDB(dependencies)
                 }
             }
 
@@ -214,6 +292,7 @@ class ChatRequests(
 
         })
     }
+
     interface ChatRoomInteraction {
         fun saveChatsToDB(chats: List<Chat>)
         fun saveMessagesToDB(messages: List<ChatMessage>)
@@ -221,5 +300,6 @@ class ChatRequests(
         suspend fun uploadPhoto(file: File): Pair<String, String>
         fun setChatCreating(value: Boolean)
         fun saveDependenciesToDB(dependencies: List<UserToChat>)
+        fun removeDependencyFromDB(dependencies: List<UserToChat>)
     }
 }

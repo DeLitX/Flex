@@ -37,6 +37,7 @@
         <activity android:name=".Activities.MakeAvatarActivity" />
         <activity android:name=".Activities.CommentsEnlist" />
         <activity android:name=".Activities.MakePostActivity" />
+        <activity android:name=".Activities.AddUsersToChat" />
         <activity
             android:name=".Activities.MainActivity"
             android:screenOrientation="portrait"

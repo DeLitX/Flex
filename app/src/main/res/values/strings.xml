@@ -59,4 +59,7 @@
     <string name="passwords_different">Passwords are not identical</string>
     <string name="nick_nust_not_empty">Nickname mustn\'t be empty</string>
     <string name="email_must_finish">Email must finish by @gmail.com</string>
+    <string name="yes">Yes</string>
+    <string name="no">NO</string>
+    <string name="do_you_want_delete_user_from_chat">Do you really want to delete this user from chat</string>
 </resources>
