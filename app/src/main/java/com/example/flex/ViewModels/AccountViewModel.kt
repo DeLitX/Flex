@@ -3,6 +3,7 @@ package com.example.flex.ViewModels
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.flex.Enums.RequestEnum
 import com.example.flex.POJO.Comment
 import com.example.flex.POJO.Post
 import com.example.flex.POJO.User
@@ -19,6 +20,7 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
     val isRegisterUpdating:LiveData<Boolean>
     val isRegistSucceed:LiveData<Boolean?>
     val errorText:LiveData<String?>
+    val resendEmailStatus:LiveData<RequestEnum>
 
     init {
         allPosts = mRepository.getAllPosts()
@@ -28,6 +30,7 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
         isRegisterUpdating=mRepository.isRegisterUpdating
         isRegistSucceed=mRepository.isRegistSucceed
         errorText=mRepository.errorText
+        resendEmailStatus=mRepository.resendEmailStatus
     }
     suspend fun getUserValueFromDB(userId:Long):User{
         return mRepository.getUserValueFromDB(userId)
@@ -59,6 +62,9 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
         CoroutineScope(IO).launch {
             mRepository.insertUser(user)
         }
+    }
+    fun resendEmail(email:String){
+        mRepository.resendEmail(email)
     }
 
     fun refreshUser(user: User?) {

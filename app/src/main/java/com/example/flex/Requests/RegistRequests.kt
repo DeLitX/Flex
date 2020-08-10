@@ -2,6 +2,7 @@ package com.example.flex.Requests
 
 import android.os.Handler
 import android.os.Looper
+import com.example.flex.Enums.RequestEnum
 import com.example.flex.MainData
 import com.example.flex.POJO.User
 import com.google.firebase.iid.FirebaseInstanceId
@@ -9,7 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
+import java.lang.Exception
 import java.net.HttpCookie
 
 class RegistRequests(private val mRegistRequestInteraction: RegistRequestInteraction) :
@@ -132,6 +135,34 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         })
     }
 
+    fun resendEmail(userId: Long, email: String) {
+        val formBody = FormBody.Builder()
+            .add("user_id", userId.toString())
+            .add("email", email)
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.URL_PREFIX_ACC_BASE}/${MainData.RESEND_EMAIL}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .build()
+
+        val call = client.newCall(request)
+        mRegistRequestInteraction.setResendStatus(RequestEnum.IN_PROCESS)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                mRegistRequestInteraction.setResendStatus(RequestEnum.FAILED)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    mRegistRequestInteraction.setResendStatus(RequestEnum.SUCCESS)
+                } else {
+                    mRegistRequestInteraction.setResendStatus(RequestEnum.FAILED)
+                }
+            }
+        })
+    }
+
     fun checkLog() {
         var cookies: List<HttpCookie>
         val urlHttp = HttpUrl.Builder().scheme("https")
@@ -189,11 +220,21 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     CoroutineScope(IO).launch {
-                        cookies = cookieManager.cookieStore.cookies
-                        /*repository.setCSRFToken(cookies[0].value)
-                        repository.setSessionId(cookies[1].value)*/
-                        mRegistRequestInteraction.setRegisterUpdating(false)
-                        mRegistRequestInteraction.setRegistSucceed(true)
+                        try {
+                            if (response.body != null) {
+                                val body = response.body!!.string()
+                                val jsonObject = JSONObject(body)
+                                mRegistRequestInteraction.setYourId(
+                                    jsonObject["user_id"].toString().toLong()
+                                )
+                            }
+                            cookies = cookieManager.cookieStore.cookies
+                            mRegistRequestInteraction.setRegisterUpdating(false)
+                            mRegistRequestInteraction.setRegistSucceed(true)
+                        } catch (e: Exception) {
+                            mRegistRequestInteraction.setRegistSucceed(false)
+                            mRegistRequestInteraction.setRegisterUpdating(false)
+                        }
                     }
                 } else {
                     mRegistRequestInteraction.setRegistSucceed(false)
@@ -211,6 +252,7 @@ class RegistRequests(private val mRegistRequestInteraction: RegistRequestInterac
         fun setLoginUpdating(value: Boolean)
         fun setRegisterUpdating(value: Boolean)
         fun setRegistSucceed(value: Boolean?)
+        fun setResendStatus(value: RequestEnum)
         fun addUserToDB(user: User)
     }
 }

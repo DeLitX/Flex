@@ -69,4 +69,5 @@ object MainData {
     const val REMOVE_FROM_CHAT="remove_from_group_chat"
     const val ADD_TO_CHAT="add_to_group_chat"
     const val CREATE_CHAT_REQUEST_CODE=1234
+    const val RESEND_EMAIL="resend_email"
 }

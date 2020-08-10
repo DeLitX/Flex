@@ -1,110 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/registration"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:paddingHorizontal="30dp"
+    android:paddingVertical="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/registration_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:text="@string/sign_up"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/registration_fields"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/registration_fields"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/login"
+            android:inputType="textPersonName"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/registration_fields"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/repeat_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/registration_fields"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/repeat_password"
+            android:inputType="textPassword"
+            android:padding="5dp" />
+
+        <TextView
+            android:id="@+id/text_below_registration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+        <Button
+            android:id="@+id/sign_up_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/registration_fields"
+            android:text="@string/sign_up" />
+
+        <TextView
+            android:id="@+id/have_acc"
+            style="@style/TextHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="@string/already_account" />
+
+        <ProgressBar
+            android:id="@+id/register_update_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/margin_border"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/registration_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="15dp"
-        android:gravity="center"
-        android:text="@string/sign_up"
-        android:textSize="22sp" />
-
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/registration_fields"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:padding="5dp" />
-
-    <EditText
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/registration_fields"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/login"
-        android:inputType="textPersonName"
-        android:padding="5dp" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/registration_fields"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:padding="5dp" />
-
-    <EditText
-        android:id="@+id/repeat_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/registration_fields"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/repeat_password"
-        android:inputType="textPassword"
-        android:padding="5dp" />
-
-    <TextView
-        android:id="@+id/text_below_registration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-
-    <Button
-        android:id="@+id/sign_up_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="60dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/registration_fields"
-        android:text="@string/sign_up" />
-
-    <TextView
-        android:id="@+id/have_acc"
-        style="@style/TextHint"
+        android:id="@+id/not_received_email"
+        style="@style/Text.Gray.Mini"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="40dp"
-        android:text="@string/already_account" />
-
-    <ProgressBar
-        android:id="@+id/register_update_circle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"
-        android:layout_margin="@dimen/margin_border" />
-
-</LinearLayout>
+        android:layout_gravity="bottom|center_horizontal"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/margin_border_a_little"
+        android:text="@string/not_received_email"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

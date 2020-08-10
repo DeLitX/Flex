@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.flex.Enums.RequestEnum
 import com.example.flex.ViewModels.AccountViewModel
 import com.example.flex.R
 
@@ -17,13 +18,15 @@ class Registration : AppCompatActivity() {
     private lateinit var mRepeatPassword: EditText
     private lateinit var mViewModel: AccountViewModel
     private lateinit var mUpdateBar: ProgressBar
-    private lateinit var mTextBelowRegistration:TextView
+    private lateinit var mTextBelowRegistration: TextView
+    private lateinit var mSignUp: Button
+    private lateinit var mNotReceivedEmail: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_activity)
         mViewModel = ViewModelProvider(this).get(AccountViewModel::class.java)
-        setActionListener()
+        bindActivity()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -34,35 +37,48 @@ class Registration : AppCompatActivity() {
         mRepeatPassword.setText("")
     }
 
-    private fun setActionListener() {
+    private fun bindActivity() {
         mEmail = findViewById(R.id.email)
         mLogin = findViewById(R.id.login)
         mPassword = findViewById(R.id.password)
         mRepeatPassword = findViewById(R.id.repeat_password)
         mUpdateBar = findViewById(R.id.register_update_circle)
-        mTextBelowRegistration=findViewById(R.id.text_below_registration)
-        val signUp = findViewById<Button>(R.id.sign_up_button)
+        mUpdateBar.isIndeterminate = true
+        mTextBelowRegistration = findViewById(R.id.text_below_registration)
+        mSignUp = findViewById(R.id.sign_up_button)
         val haveAcc = findViewById<TextView>(R.id.have_acc)
+        mNotReceivedEmail = findViewById(R.id.not_received_email)
+        mViewModel.resendEmailStatus.observe(this, Observer {
+            mUpdateBar.visibility = if (it == RequestEnum.IN_PROCESS) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            enableRegister(it != RequestEnum.IN_PROCESS)
+            if (it == RequestEnum.FAILED) {
+                Toast.makeText(this, getString(R.string.failed_resend_email), Toast.LENGTH_LONG)
+                    .show()
+            }
+        })
+        mNotReceivedEmail.setOnClickListener {
+            mViewModel.resendEmail(mEmail.text.trim().toString())
+
+        }
         mViewModel.isRegisterUpdating.observe(this, Observer {
             mUpdateBar.visibility = if (it) {
                 View.VISIBLE
             } else {
                 View.GONE
             }
-            signUp.isEnabled = !it
-            mUpdateBar.isIndeterminate = it
-            mEmail.isEnabled=!it
-            mLogin.isEnabled=!it
-            mPassword.isEnabled=!it
-            mRepeatPassword.isEnabled=!it
+            enableRegister(!it)
         })
         mViewModel.isRegistSucceed.observe(this, Observer {
-            if(it==false){
-                mTextBelowRegistration.text=getString(R.string.smth_went_wrong)
-            }else if(it==true){
-                   mTextBelowRegistration.text= getString(R.string.we_sent_letter)
-            }else{
-                mTextBelowRegistration.text=""
+            if (it == false) {
+                mTextBelowRegistration.text = getString(R.string.smth_went_wrong)
+            } else if (it == true) {
+                mTextBelowRegistration.text = getString(R.string.we_sent_letter)
+            } else {
+                mTextBelowRegistration.text = ""
             }
         })
         haveAcc.setOnClickListener {
@@ -70,7 +86,7 @@ class Registration : AppCompatActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
         }
-        signUp.setOnClickListener {
+        mSignUp.setOnClickListener {
             if (mPassword.text.toString().trim() == mRepeatPassword.text.toString().trim() &&
                 mLogin.text.toString().trim() != "" && mEmail.text.toString().contains("@gmail.com")
             ) {
@@ -80,13 +96,22 @@ class Registration : AppCompatActivity() {
                     password = mPassword.text.toString()
                 )
 
-            }else if(mPassword.text.toString().trim() != mRepeatPassword.text.toString().trim()){
-                mTextBelowRegistration.text= getString(R.string.passwords_different)
-            }else if(mLogin.text.toString().trim() == ""){
-                mTextBelowRegistration.text=getString(R.string.nick_nust_not_empty)
-            }else{
-                mTextBelowRegistration.text=getString(R.string.email_must_finish)
+            } else if (mPassword.text.toString().trim() != mRepeatPassword.text.toString().trim()) {
+                mTextBelowRegistration.text = getString(R.string.passwords_different)
+            } else if (mLogin.text.toString().trim() == "") {
+                mTextBelowRegistration.text = getString(R.string.nick_nust_not_empty)
+            } else {
+                mTextBelowRegistration.text = getString(R.string.email_must_finish)
             }
         }
+    }
+
+    fun enableRegister(value: Boolean) {
+        mSignUp.isEnabled = value
+        mEmail.isEnabled = value
+        mLogin.isEnabled = value
+        mPassword.isEnabled = value
+        mRepeatPassword.isEnabled = value
+        mNotReceivedEmail.isEnabled = value
     }
 }

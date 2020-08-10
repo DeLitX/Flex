@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -49,6 +50,11 @@ class CameraFragment : Fragment() {
         val changePassBtn = v.findViewById<Button>(R.id.button_change_pass)
         val makePostBtn = v.findViewById<Button>(R.id.button_make_post)
         val testNotificationBtn = v.findViewById<Button>(R.id.button_test_notification)
+        val email: EditText = v.findViewById(R.id.email)
+        val resendEmail: Button = v.findViewById(R.id.resend_email)
+        resendEmail.setOnClickListener {
+            mViewModel.resendEmail(email.text.trim().toString())
+        }
         testNotificationBtn.setOnClickListener {
             mViewModel.testNotification()
         }

@@ -12,17 +12,18 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/flex_icon"
-        android:roundIcon="@mipmap/flex_icon"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/flex_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
-        <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBDsb3j66Hv1VVXyayVFBGG0jQG0j2ejKE"/>
+        android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBDsb3j66Hv1VVXyayVFBGG0jQG0j2ejKE" />
 
         <activity android:name=".Activities.CompleteCreateChat" />
         <activity android:name=".Activities.CreateChat" />
-        <activity android:name=".Activities.ChatActivity"/>
+        <activity android:name=".Activities.ChatActivity" />
 
         <uses-library
             android:name="android.test.runner"

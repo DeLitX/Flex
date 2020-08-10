@@ -62,4 +62,6 @@
     <string name="yes">Yes</string>
     <string name="no">NO</string>
     <string name="do_you_want_delete_user_from_chat">Do you really want to delete this user from chat</string>
+    <string name="not_received_email">Not received an E-mail? Click here.</string>
+    <string name="failed_resend_email">Failed to resend email.Try later.</string>
 </resources>
