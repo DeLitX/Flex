@@ -228,7 +228,7 @@ class ChatRequests(
             if (response.isSuccessful) {
                 val body = response.body?.string()
                 if (body != null) {
-                    mChatRoomInteraction.saveChatsToDB(
+                    mChatRoomInteraction.addChatsToDB(
                         listOf(
                             Chat(
                                 id = body.toLong(),
@@ -300,6 +300,7 @@ class ChatRequests(
         suspend fun uploadPhoto(file: File): Pair<String, String>
         fun setChatCreating(value: Boolean)
         fun saveDependenciesToDB(dependencies: List<UserToChat>)
+        fun addChatsToDB(chats: List<Chat>)
         fun removeDependencyFromDB(dependencies: List<UserToChat>)
     }
 }

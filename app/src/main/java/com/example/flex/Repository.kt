@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.flex.DataBase.*
 import com.example.flex.Enums.ChatConnectEnum
+import com.example.flex.Enums.CreateChatEnum
 import com.example.flex.Enums.MessageSentEnum
 import com.example.flex.POJO.*
 import com.example.flex.Requests.*
@@ -51,6 +52,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
     val errorText: MutableLiveData<String?>
     val userGoTo: MutableLiveData<User?>
     val chatConnectStatus: MutableLiveData<ChatConnectEnum>
+    val chatCreatingState:MutableLiveData<CreateChatEnum>
 
     init {
         val postDatabase = PostDatabase.get(application)
@@ -81,6 +83,7 @@ class Repository(private val application: Application) : UserRequests.UserReques
         errorText = MutableLiveData(null)
         userGoTo = MutableLiveData(null)
         chatConnectStatus = MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
+        chatCreatingState=MutableLiveData(CreateChatEnum.UNDEFINED)
     }
 
     fun addUsersToChat(ids: List<Long>, chatId: Long) {
@@ -749,6 +752,10 @@ class Repository(private val application: Application) : UserRequests.UserReques
             ids.add(i.userId)
         }
         refreshUsersByIds(ids)
+    }
+
+    override fun addChatsToDB(chats: List<Chat>) {
+        mChatDao.insert(chats)
     }
 
     override fun removeDependencyFromDB(dependencies: List<UserToChat>) {

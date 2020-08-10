@@ -1,5 +1,6 @@
 package com.example.flex.Activities
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -55,6 +56,8 @@ class CompleteCreateChat : BaseGetPhotoActivity(), BottomAddPhotoDialog.PhotoInt
             mCompleteButton.isEnabled = !it
             if (it) {
                 mAvatar.setOnClickListener {}
+                setResult(Activity.RESULT_OK)
+                finish()
             } else {
                 mAvatar.setOnClickListener {
                     val bottomSheet = BottomAddPhotoDialog(this)
