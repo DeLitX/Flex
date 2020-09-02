@@ -76,12 +76,14 @@ open class AccountFragment : Fragment(),
                 })
                 mAccountViewModel.refreshUser(mUser)
                 if (mUser != null) {
-                    if (mUser!!.imageUrl != "") mAccountViewModel.downloadPhoto(
-                        mUser!!.imageUrl,
-                        avatar
-                    )
-                    mFollowersCount.text = mUser!!.followersCount.toString()
-                    mFollowingCount.text = mUser!!.followingCount.toString()
+                    withContext(Main) {
+                        if (mUser!!.imageUrl != "") mAccountViewModel.downloadPhoto(
+                            mUser!!.imageUrl,
+                            avatar
+                        )
+                        mFollowersCount.text = mUser!!.followersCount.toString()
+                        mFollowingCount.text = mUser!!.followingCount.toString()
+                    }
                 }
             }
         }

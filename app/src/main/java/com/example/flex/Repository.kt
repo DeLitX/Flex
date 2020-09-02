@@ -289,10 +289,8 @@ class Repository(private val application: Application) : UserRequests.UserReques
 
     fun downloadPhoto(link: String, photo: ImageView) {
         //TODO cache images
-
-        CoroutineScope(IO).launch {
-            downloadPhotoAsync(link, photo)
-        }
+        val request=makePhotoRequest()
+        request.downloadPhotoByUrl(link, photo)
     }
 
     fun search(query: String) {
@@ -464,10 +462,6 @@ class Repository(private val application: Application) : UserRequests.UserReques
         request.commentPost(post.id, text)
     }
 
-    private suspend fun downloadPhotoAsync(link: String, photo: ImageView) {
-        val request = makePhotoRequest()
-        request.downloadPhotoByUrl(link, photo)
-    }
 
     private suspend fun forgotPasswordAsync(email: String) {
         val request = ForgotPassRequests()

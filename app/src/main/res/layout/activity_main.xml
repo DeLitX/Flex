@@ -24,7 +24,6 @@
         app:itemIconTint="@drawable/item_state"
         app:itemTextColor="@drawable/item_state"
         app:labelVisibilityMode="unlabeled"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_bar_menu" />
 

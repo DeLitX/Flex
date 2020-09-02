@@ -15,7 +15,7 @@ open class UsersAdapter(
 ) :
     RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
     var searchList = mutableListOf<User>()
-    internal var layoutId:Int=R.layout.search_user
+    internal var layoutId: Int = R.layout.search_user
 
     constructor(mUsersAdapterInteraction: UsersAdapterInteraction) : this(
         null,

@@ -17,7 +17,7 @@ class PostRequests(
     private val mPostRequestsInteraction: PostRequestsInteraction,
     private var csrftoken: String,
     private var sessionId: String
-):BaseRequestFunctionality() {
+) : BaseRequestFunctionality() {
     fun stopRequests() {
         for (call in client.dispatcher.queuedCalls()) {
             if (call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_HOME ||
@@ -209,7 +209,8 @@ class PostRequests(
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-
+                if (true) {
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
