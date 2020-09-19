@@ -20,6 +20,7 @@
     <string name="take_picture">Take picture</string>
     <string name="enter_email">Enter email</string>
     <string name="send_code_email">Send code on email</string>
+    <string name="send_letter_email">Send email</string>
     <string name="code_email">Code from email</string>
     <string name="new_password">New password</string>
     <string name="change_password">Change password</string>
@@ -61,7 +62,12 @@
     <string name="email_must_finish">Email must finish by @gmail.com</string>
     <string name="yes">Yes</string>
     <string name="no">NO</string>
-    <string name="do_you_want_delete_user_from_chat">Do you really want to delete this user from chat</string>
-    <string name="not_received_email">Not received an E-mail? Click here.</string>
+    <string name="do_you_want_delete_user_from_chat">Do you really want to delete this user from chat?</string>
+    <string name="not_received_email">Not received an E-mail? <u>Click here</u></string>
     <string name="failed_resend_email">Failed to resend email.Try later.</string>
+    <string name="chat_added_user">added</string>
+    <string name="chat_deleted_user">deleted</string>
+    <string name="forgot_password">Forgot password?<u>Click here</u></string>
+    <string name="failed_password">Failed to change password.Try again later.</string>
+    <string name="error_occurred">An error occurred.</string>
 </resources>

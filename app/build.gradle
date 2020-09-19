@@ -10,13 +10,13 @@ apply plugin: 'de.mannodermaus.android-junit5'
 
 android {
 
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
-        applicationId "com.example.flex"
+        applicationId "com.delitx.flex"
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 8
-        versionName "0.0.8"
+        targetSdkVersion 30
+        versionCode 17
+        versionName "0.0.17"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -29,29 +29,28 @@ android {
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'com.android.support:design:30.0.0'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.firebase:firebase-messaging:20.2.4'
 
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
 
     implementation "androidx.core:core-ktx:1.3.1"
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.8.1'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.5.0'
-    implementation 'com.google.firebase:firebase-analytics:17.4.4'
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
+    implementation 'com.google.firebase:firebase-analytics:17.5.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    implementation 'com.google.firebase:firebase-messaging:20.2.4'
 
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.0.rc1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.0.rc1'
@@ -72,7 +71,7 @@ dependencies {
 
     // Room components
     implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
@@ -98,6 +97,10 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.2"
     testImplementation "org.mockito:mockito-core:2.23.4"
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
 }
 repositories {
     mavenCentral()

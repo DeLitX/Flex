@@ -20,10 +20,10 @@
         android:title="Map"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_camera"
-        android:title="Camera"
+        android:id="@+id/action_chat"
+        android:title="Chat"
         android:enabled="true"
-        android:icon="@drawable/ic_camera"
+        android:icon="@drawable/ic_chat"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_account"

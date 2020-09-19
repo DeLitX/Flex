@@ -1,0 +1,238 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/switchRecyclers"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:clickable="false" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/recycler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/fake_toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:background="@color/colorWhite"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/background"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_gravity="top"
+                android:background="@drawable/image4"
+                android:contentDescription="@string/background"
+                app:layout_collapseMode="pin"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border">
+
+                <LinearLayout
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="130dp"
+                    android:background="@drawable/rounded_corners"
+                    android:elevation="5dp"
+                    android:orientation="vertical"
+                    app:layout_collapseMode="pin"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+
+                    <LinearLayout
+                        android:id="@+id/test"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="40dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/nickname"
+                            style="@style/Text.Black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text=""
+                            android:visibility="invisible" />
+
+                        <TextView
+                            style="@style/Text.Gray.Mini"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginBottom="@dimen/margin_border"
+                            android:text="Description" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/margin_border_a_little"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <LinearLayout
+                                android:id="@+id/followers_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/followers_count"
+                                    style="@style/Text.Black.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:text="" />
+
+                                <TextView
+                                    android:id="@+id/followers_text"
+                                    style="@style/Text.Gray.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_border_a_little"
+                                    android:gravity="center_horizontal"
+                                    android:text="@string/followers_text" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/followed_count"
+                                    style="@style/Text.Black.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:text="" />
+
+                                <TextView
+                                    android:id="@+id/followed_text"
+                                    style="@style/Text.Gray.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_border_a_little"
+                                    android:gravity="center_horizontal"
+                                    android:text="@string/followed_text" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/posts_count"
+                                    style="@style/Text.Black.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:text="\?" />
+
+                                <TextView
+                                    android:id="@+id/posts_text"
+                                    style="@style/Text.Gray.Mini"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_border_a_little"
+                                    android:gravity="center_horizontal"
+                                    android:text="@string/posts" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/margin_border_a_little"
+                    android:src="@drawable/ic_settings"
+                    app:layout_constraintEnd_toEndOf="@id/toolbar"
+                    app:layout_constraintTop_toTopOf="@id/toolbar"
+                    android:elevation="6dp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_border"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/colorPrimaryDark" />
+
+    <ImageView
+        android:id="@+id/fake_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="5.5dp"
+        app:layout_behavior=".ui.behaviour.ToolbarFromTopBehaviour" />
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_icon_main"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_horizontal"
+        android:elevation="6dp"
+        android:src="@drawable/ic_launcher_background"
+        app:finalHeight="32dp"
+        app:finalYPosition="2dp"
+
+        app:layout_behavior=".ui.behaviour.ToolbarImageBehaviour" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="1dp"
+        android:layout_height="50dp"
+        app:layout_anchor="@id/toolbar" />
+
+    <TextView
+        android:id="@+id/user_name"
+        style="@style/Text.Black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:elevation="6dp"
+        app:layout_anchor="@id/nickname"
+        app:layout_anchorGravity="center" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

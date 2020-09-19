@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.MakeAvatarActivity">
-    <com.example.flex.SquareImageView
+    tools:context=".ui.activities.MakeAvatarActivity">
+    <com.delitx.flex.ui.SquareImageView
         android:id="@+id/send_image_avatar"
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"

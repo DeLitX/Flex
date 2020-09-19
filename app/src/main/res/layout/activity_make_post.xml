@@ -4,7 +4,7 @@
     android:id="@+id/make_post_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.MakePostActivity">
+    tools:context=".ui.activities.MakePostActivity">
 
     <LinearLayout
         android:id="@+id/linear_layout"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.example.flex.SquareImageView
+        <com.delitx.flex.ui.SquareImageView
             android:id="@+id/publish_post_image"
             android:layout_width="0dp"
             android:layout_height="0dp"

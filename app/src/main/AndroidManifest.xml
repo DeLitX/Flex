@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.flex">
+    package="com.delitx.flex">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name="com.delitx.flex.FlexApp"
         android:allowBackup="true"
         android:icon="@mipmap/flex_icon"
         android:label="@string/app_name"
@@ -21,9 +22,16 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBDsb3j66Hv1VVXyayVFBGG0jQG0j2ejKE" />
 
-        <activity android:name=".Activities.CompleteCreateChat" />
-        <activity android:name=".Activities.CreateChat" />
-        <activity android:name=".Activities.ChatActivity" />
+        <activity android:name="com.delitx.flex.ui.activities.CompleteCreateChat" />
+        <activity android:name="com.delitx.flex.ui.activities.CreateChat" />
+        <activity android:name="com.delitx.flex.ui.activities.ChatActivity" />
+        <activity android:name="com.delitx.flex.ui.activities.NotReceivedEmail"/>
+        <activity android:name="com.delitx.flex.ui.activities.MakeAvatarActivity" />
+        <activity android:name="com.delitx.flex.ui.activities.CommentsEnlist" />
+        <activity android:name="com.delitx.flex.ui.activities.MakePostActivity" />
+        <activity android:name="com.delitx.flex.ui.activities.AddUsersToChat" />
+        <activity android:name=".ui.activities.BaseGetPhotoActivity"
+            android:launchMode="standard"/>
 
         <uses-library
             android:name="android.test.runner"
@@ -35,12 +43,8 @@
             android:name="android.test.mock"
             android:required="false" />
 
-        <activity android:name=".Activities.MakeAvatarActivity" />
-        <activity android:name=".Activities.CommentsEnlist" />
-        <activity android:name=".Activities.MakePostActivity" />
-        <activity android:name=".Activities.AddUsersToChat" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.delitx.flex.ui.activities.MainActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -62,11 +66,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.Registration"
+            android:name="com.delitx.flex.ui.activities.Registration"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".Activities.SignIn"
+            android:name="com.delitx.flex.ui.activities.SignIn"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -81,13 +85,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.ForgotPass"
+            android:name="com.delitx.flex.ui.activities.ForgotPass"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.flex.fileprovider"
+            android:authorities="com.delitx.flex.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -96,8 +100,9 @@
         </provider>
 
         <service
-            android:name=".FlexFirebaseMessagingService"
-            android:stopWithTask="false">
+            android:name="com.delitx.flex.data.network_interaction.FlexFirebaseMessagingService"
+            android:stopWithTask="false"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

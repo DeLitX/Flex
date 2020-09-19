@@ -218,7 +218,7 @@
         android:layout_height="0dp"
         android:background="@color/colorPrimaryDark"
         android:elevation="5.5dp"
-        app:layout_behavior=".Behaviour.ToolbarFromTopBehaviour" />
+        app:layout_behavior=".ui.behaviour.ToolbarFromTopBehaviour" />
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -231,7 +231,7 @@
         app:finalHeight="32dp"
         app:finalYPosition="2dp"
 
-        app:layout_behavior=".Behaviour.ToolbarImageBehaviour" />
+        app:layout_behavior=".ui.behaviour.ToolbarImageBehaviour" />
 
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"

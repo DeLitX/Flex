@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:365114116741:android:f0262808702f002078f7ec",
         "android_client_info": {
-          "package_name": "com.example.flex"
+          "package_name": "com.delitx.flex"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "365114116741-5s26nts2k9f8rj2r5b1u1n3uj315fvgb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.flex",
+            "package_name": "com.delitx.flex",
             "certificate_hash": "d4172fee124ef24b4dc3cc51b979c19f3f21e05a"
           }
         },
