@@ -16,6 +16,8 @@ interface DependenciesDao {
 
     @Query("delete from user_to_chat")
     fun deleteDependencies()
+    @Query("delete from user_to_chat where chatId=:chatId")
+    fun deleteFromChat(chatId:Long)
 
     @Delete
     fun delete(dependencies: List<UserToChat>)

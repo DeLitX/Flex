@@ -25,6 +25,7 @@ import com.delitx.flex.pojo.User
 import com.delitx.flex.view_models.ChatViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_chat_info_screen.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -55,7 +56,6 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         mViewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-
         firstConnectToChat()
         bindActivity()
     }
@@ -79,7 +79,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
             } else {
                 val intent = intent
                 mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)
-                mUserName = intent.getStringExtra(MainData.PUT_USER_NAME)?:""
+                mUserName = intent.getStringExtra(MainData.PUT_USER_NAME) ?: ""
                 mViewModel.connectChat(mUserName)
             }
             mIsConnected = true
@@ -96,6 +96,24 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
         mViewPagerAdapter.addFragment(mUsersFragment, "Members")
         val chatStatusText: TextView = findViewById(R.id.chat_status)
         val chatStatus: ProgressBar = findViewById(R.id.connecting_chat_progress_bar)
+        get_link_button.setOnClickListener {
+            get_link_button.text = resources.getString(R.string.generating)
+            get_link_button.isEnabled = false
+            CoroutineScope(IO).launch {
+                val result = mViewModel.generateInviteLink(mChatId)
+                withContext(Main) {
+                    get_link_button.text = resources.getString(R.string.get_invite_chat_link)
+                    get_link_button.isEnabled = true
+                    if (!result) {
+                        Toast.makeText(
+                            this@ChatActivity.applicationContext,
+                            resources.getString(R.string.error_occurred),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
         mViewModel.chatConnectStatus.observe(this, Observer {
             when (it) {
                 ChatConnectEnum.NOT_CONNECTED -> {

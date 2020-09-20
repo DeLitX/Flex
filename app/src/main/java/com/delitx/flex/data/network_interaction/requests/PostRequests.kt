@@ -16,28 +16,6 @@ class PostRequests(
     private var csrftoken: String,
     private var sessionId: String
 ) : BaseRequestFunctionality() {
-    fun stopRequests() {
-        for (call in client.dispatcher.queuedCalls()) {
-            if (call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_HOME ||
-                call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_ACCOUNT ||
-                call.request().tag() == MainData.TAG_COMMENT ||
-                call.request().tag() == MainData.TAG_LIKE ||
-                call.request().tag() == MainData.TAG_UNLIKE
-            ) {
-                call.cancel()
-            }
-        }
-        for (call in client.dispatcher.runningCalls()) {
-            if (call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_HOME ||
-                call.request().tag() == MainData.TAG_VIEW_ALL_POSTS_ACCOUNT ||
-                call.request().tag() == MainData.TAG_COMMENT ||
-                call.request().tag() == MainData.TAG_LIKE ||
-                call.request().tag() == MainData.TAG_UNLIKE
-            ) {
-                call.cancel()
-            }
-        }
-    }
 
     fun unLikePost(post: Post) {
         val formBody = FormBody.Builder()

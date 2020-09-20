@@ -4,6 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_bottom_corners">
+    <Button
+        android:id="@+id/get_link_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/main_app_buttons"
+        android:layout_margin="@dimen/margin_border_a_little"
+        android:text="@string/get_invite_chat_link"/>
 
 
     <com.google.android.material.tabs.TabLayout
@@ -11,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/get_link_button"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/chat_info_view_pager"

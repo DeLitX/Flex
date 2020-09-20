@@ -64,6 +64,16 @@
                     android:host="main.com"
                     android:scheme="flex" />
             </intent-filter>
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <data
+                    android:host="group_invite"
+                    android:scheme="flex" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.delitx.flex.ui.activities.Registration"

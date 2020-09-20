@@ -92,85 +92,6 @@ class ChatRequests(
         })
     }
 
-    fun removeUsersFromChat(ids: List<Long>, chatId: Long) {
-        val usersId = longsListToJsonIdList(ids)
-        val formBody = FormBody.Builder()
-            .add("csrfmiddlewaretoken", mCsrftoken)
-            .add("chat_id", chatId.toString())
-            .add("users_id", usersId)
-            .build()
-        val request = Request.Builder()
-            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.REMOVE_FROM_CHAT}")
-            .post(formBody)
-            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
-            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
-            .build()
-        Log.d("removeUsersFromChat", "start")
-        val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    Log.d("removeUsersFromChat", "successful")
-                    val dependencies = mutableListOf<UserToChat>()
-                    for (i in ids) {
-                        dependencies.add(
-                            UserToChat(
-                                chatId = chatId,
-                                userId = i
-                            )
-                        )
-                    }
-                    mChatRoomInteraction.removeDependencyFromDB(dependencies)
-                }
-                Log.d("removeUsersFromChat", response.code.toString())
-            }
-
-        })
-    }
-
-    fun addUsersToChat(ids: List<Long>, chatId: Long) {
-        val usersId = longsListToJsonIdList(ids)
-        val formBody = FormBody.Builder()
-            .add("csrfmiddlewaretoken", mCsrftoken)
-            .add("chat_id", chatId.toString())
-            .add("users_id", usersId)
-            .build()
-        val request = Request.Builder()
-            .url(
-                "https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.ADD_TO_CHAT}"
-            )
-            .post(formBody)
-            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
-            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
-            .build()
-        val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val dependencies = mutableListOf<UserToChat>()
-                    for (i in ids) {
-                        dependencies.add(
-                            UserToChat(
-                                chatId = chatId,
-                                userId = i
-                            )
-                        )
-                    }
-                    mChatRoomInteraction.saveDependenciesToDB(dependencies)
-                }
-            }
-
-        })
-    }
-
     fun refreshChatUsers(chatId: Long) {
         val formBody = FormBody.Builder()
             .add("csrfmiddlewaretoken", mCsrftoken)
@@ -244,7 +165,7 @@ class ChatRequests(
             val response = call.execute()
             if (response.isSuccessful) {
                 val body = response.body?.string()
-                val json=JSONObject(body)
+                val json = JSONObject(body)
                 if (body != null) {
                     mChatRoomInteraction.addChatsToDB(
                         listOf(
@@ -309,6 +230,47 @@ class ChatRequests(
         })
     }
 
+    suspend fun createGroupInvite(chatId: Long): Boolean {
+        val formBody = FormBody.Builder()
+            .add("chat_id", chatId.toString())
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CREATE_GROUP_INVITE}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        val response = call.execute()
+
+        if (response.isSuccessful) {
+            val body = response.body?.string()
+            if (body != null) {
+                mChatRoomInteraction.copyToClipboard(body)
+                return true
+            }
+        }
+        return false
+    }
+
+    suspend fun checkGroupInvite(chatId: Long, token: String): Boolean {
+        val formBody = FormBody.Builder()
+            .add("chat_id", chatId.toString())
+            .add("token", token)
+            .add("csrfmiddlewaretoken", mCsrftoken)
+            .build()
+        val request = Request.Builder()
+            .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CHECK_GROUP_INVITE}")
+            .post(formBody)
+            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
+            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
+            .build()
+        val call = client.newCall(request)
+        val response = call.execute()
+        return response.isSuccessful
+    }
+
     interface ChatRoomInteraction {
         fun saveChatsToDB(chats: List<Chat>)
         fun saveMessagesToDB(messages: List<ChatMessage>)
@@ -320,5 +282,6 @@ class ChatRequests(
         fun removeDependencyFromDB(dependencies: List<UserToChat>)
         fun receiveAddUsers(message: List<AddUserMessage>)
         fun receiveDeleteUsers(message: List<DeleteUserMessage>)
+        fun copyToClipboard(text: String)
     }
 }

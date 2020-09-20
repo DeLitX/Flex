@@ -70,4 +70,7 @@
     <string name="forgot_password">Forgot password?<u>Click here</u></string>
     <string name="failed_password">Failed to change password.Try again later.</string>
     <string name="error_occurred">An error occurred.</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="get_invite_chat_link">Get invite link</string>
+    <string name="generating">Generating</string>
 </resources>

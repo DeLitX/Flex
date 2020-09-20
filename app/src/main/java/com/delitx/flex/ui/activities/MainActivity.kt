@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
     var home = HomeFragment()
     var tv = TvFragment()
     var map = MapFragment()
-    var camera = CameraFragment()
     var chat = ChatRoomFragment()
     private lateinit var mBnv: BottomNavigationView
     private lateinit var mViewModel: AccountViewModel
@@ -33,8 +32,6 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
         setContentView(R.layout.activity_main)
-        val action = intent?.action
-        val data = intent?.data
         val sharedPreferences = getSharedPreferences("shared prefs", Context.MODE_PRIVATE)
         val sessionId = sharedPreferences.getString(MainData.SESSION_ID, "")
         val csrftoken = sharedPreferences.getString(MainData.CRSFTOKEN, "")
@@ -60,10 +57,15 @@ class MainActivity : AppCompatActivity(), ChatActivity.ChatInteraction {
                 }
             }
         }
-        setActionListener()
+        val data = intent?.data
+        if(data!=null && data.toString().contains("group_invite")){
+            supportFragmentManager.beginTransaction().replace(R.id.frame_container, chat, "fragment_tag").commit()
+            chat.dispatchHandleInvite(data.toString())
+        }
+        bindActivity()
     }
 
-    private fun setActionListener() {
+    private fun bindActivity() {
         mBnv = findViewById(R.id.bottom_bar)
         mMapIcon = findViewById(R.id.map_icon)
         mMapIcon.setOnClickListener {

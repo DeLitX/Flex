@@ -1,13 +1,17 @@
 package com.delitx.flex.data.local
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.delitx.flex.MainData
+import com.delitx.flex.R
 import com.delitx.flex.data.local.data_base.*
 import com.delitx.flex.data.network_interaction.requests.PostRequests
 import com.delitx.flex.data.network_interaction.requests.*
@@ -20,6 +24,7 @@ import com.delitx.flex.pojo.*
 import com.delitx.flex.view_models.MixedChatLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import okhttp3.Cache
 import java.io.File
@@ -28,8 +33,10 @@ import java.util.*
 
 class Repository private constructor(private val application: Application) :
     UserRequests.UserRequestsInteraction,
-    PostRequests.PostRequestsInteraction, RegistRequests.RegistRequestInteraction, ChatInteraction,
-    ChatRequests.ChatRoomInteraction, SearchRequests.SearchInteraction,ForgotPassRequests.ForgotPassInteraction {
+    PostRequests.PostRequestsInteraction, RegistRequests.RegistrationRequestInteraction,
+    ChatInteraction,
+    ChatRequests.ChatRoomInteraction, SearchRequests.SearchInteraction,
+    ForgotPassRequests.ForgotPassInteraction {
     val postDao: PostDao
     val postsInFeed: LiveData<List<Post>>
     private val mPosts: LiveData<List<Post>>
@@ -59,7 +66,7 @@ class Repository private constructor(private val application: Application) :
     val userGoTo: MutableLiveData<User?>
     val chatConnectStatus: MutableLiveData<ChatConnectEnum>
     val resendEmailStatus: MutableLiveData<RequestEnum>
-    val forgotPassStatus:MutableLiveData<RequestEnum> = MutableLiveData(RequestEnum.UNDEFINED)
+    val forgotPassStatus: MutableLiveData<RequestEnum> = MutableLiveData(RequestEnum.UNDEFINED)
 
     companion object {
         private var mInstance: Repository? = null
@@ -103,6 +110,14 @@ class Repository private constructor(private val application: Application) :
         userGoTo = MutableLiveData(null)
         chatConnectStatus = MutableLiveData(ChatConnectEnum.NOT_CONNECTED)
         resendEmailStatus = MutableLiveData(RequestEnum.UNDEFINED)
+    }
+
+    suspend fun generateChatInviteLink(chatId: Long): Boolean {
+        return makeChatRequest().createGroupInvite(chatId)
+    }
+
+    suspend fun checkChatToken(chatId: Long, token: String): Boolean {
+        return makeChatRequest().checkGroupInvite(chatId, token)
     }
 
     suspend fun getLastMessage(chatId: Long): ChatMessage {
@@ -754,8 +769,8 @@ class Repository private constructor(private val application: Application) :
 
     override fun receiveAddUsers(message: List<AddUserMessage>) {
         mAddUserDao.insert(message)
-        val dependencies= mutableListOf<UserToChat>()
-        for(i in message){
+        val dependencies = mutableListOf<UserToChat>()
+        for (i in message) {
             dependencies.addAll(i.toDependencies())
         }
         mDependenciesDao.insert(dependencies)
@@ -763,11 +778,24 @@ class Repository private constructor(private val application: Application) :
 
     override fun receiveDeleteUsers(message: List<DeleteUserMessage>) {
         mDeleteUserDao.insert(message)
-        val dependencies= mutableListOf<UserToChat>()
-        for(i in message){
+        val dependencies = mutableListOf<UserToChat>()
+        for (i in message) {
             dependencies.addAll(i.toDependencies())
         }
         mDependenciesDao.delete(dependencies)
+    }
+
+    override fun copyToClipboard(text: String) {
+        val manager = application.getSystemService((Context.CLIPBOARD_SERVICE)) as ClipboardManager
+        val clip = ClipData.newPlainText("chat_link", text)
+        manager.setPrimaryClip(clip)
+        CoroutineScope(Main).launch {
+            Toast.makeText(
+                application.applicationContext,
+                application.resources.getText(R.string.copied_to_clipboard),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     override fun clearChat(chatId: Long) {
@@ -820,13 +848,16 @@ class Repository private constructor(private val application: Application) :
 
     override fun saveDependenciesToDB(dependencies: List<UserToChat>) {
         //TODO fix bug with odd dependencies after request(when I add dependencies which were not in response)
-        CoroutineScope(IO).launch {
-            mDependenciesDao.insert(dependencies)
-            val ids: MutableList<Long> = mutableListOf()
-            for (i in dependencies) {
-                ids.add(i.userId)
+        if (dependencies.isNotEmpty()) {
+            CoroutineScope(IO).launch {
+                mDependenciesDao.deleteFromChat(dependencies[0].chatId)
+                mDependenciesDao.insert(dependencies)
+                val ids: MutableList<Long> = mutableListOf()
+                for (i in dependencies) {
+                    ids.add(i.userId)
+                }
+                refreshUsersByIds(ids)
             }
-            refreshUsersByIds(ids)
         }
     }
 
@@ -895,7 +926,7 @@ class Repository private constructor(private val application: Application) :
         isRegisterUpdating.postValue(value)
     }
 
-    override fun setRegistSucceed(value: Boolean?) {
+    override fun setRegistrationSucceed(value: Boolean?) {
         isRegistSucceed.postValue(value)
     }
 

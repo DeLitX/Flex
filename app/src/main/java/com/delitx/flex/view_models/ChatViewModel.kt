@@ -21,6 +21,9 @@ class ChatViewModel(private val app: Application) : BaseViewModel(app) {
         chatCreating = mRepository.chatCreating
         chatConnectStatus = mRepository.chatConnectStatus
     }
+    suspend fun generateInviteLink(chatId: Long):Boolean{
+        return mRepository.generateChatInviteLink(chatId)
+    }
 
     suspend fun getUsersByIds(ids: List<Long>): List<User> {
         return mRepository.getUsersByIds(ids)

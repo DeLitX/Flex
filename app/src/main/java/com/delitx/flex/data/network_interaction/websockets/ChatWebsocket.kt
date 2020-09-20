@@ -244,6 +244,13 @@ class ChatWebsocket(
                         )
                     )
                     mChatInteraction.deleteUsersFromChat(deleteUserMessage.toDependencies())
+                    for(i in deleteUserMessage.userIds){
+                        if(i==mUserId){
+                            closeWebsocket()
+                            break
+                            //TODO close chat window
+                        }
+                    }
                 }
                 ChatMessageTypes.ADD_USER -> {
                     val addUserMessage = utils.decodeAddUser(message)
@@ -261,8 +268,6 @@ class ChatWebsocket(
 
         }
     }
-
-
 }
 
 interface ChatInteraction {

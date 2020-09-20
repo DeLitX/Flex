@@ -71,4 +71,6 @@ object MainData {
     const val CREATE_CHAT_REQUEST_CODE=1234
     const val RESEND_EMAIL="resend_email"
     const val ADD_AVATAR="add_ava"
+    const val CREATE_GROUP_INVITE="create_group_invite"
+    const val CHECK_GROUP_INVITE="check_group_invite"
 }
