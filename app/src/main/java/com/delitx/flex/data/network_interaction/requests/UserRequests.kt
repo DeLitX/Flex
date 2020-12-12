@@ -207,7 +207,7 @@ class UserRequests(
     }
 
     suspend fun viewUserInformationAndSaveToDb(id: Long) {
-        val urlHttp = if (id == 0.toLong()) {
+        val urlHttp = if (id == 0L) {
             HttpUrl.Builder().scheme("https")
                 .host(MainData.BASE_URL)
                 .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)

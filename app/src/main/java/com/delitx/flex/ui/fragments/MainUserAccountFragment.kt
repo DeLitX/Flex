@@ -1,12 +1,12 @@
 package com.delitx.flex.ui.fragments
 
 import android.content.Intent
+import android.widget.ImageView
 import com.delitx.flex.*
 import com.delitx.flex.ui.activities.MakeAvatarActivity
 import com.delitx.flex.ui.activities.MakePostActivity
 import com.delitx.flex.ui.dialogs.BottomAccountSettingsDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.fragment_main_user_account.*
 
 class MainUserAccountFragment : AccountFragment(),
     AccountPostGridRecyclerFragment.UserUpdates {
@@ -34,7 +34,7 @@ class MainUserAccountFragment : AccountFragment(),
             )
             startActivity(intent)
         }
-        settings.setOnClickListener {
+        v.findViewById<ImageView>(R.id.settings).setOnClickListener {
             BottomAccountSettingsDialog().show(activity!!.supportFragmentManager,"settings_tag")
         }
     }

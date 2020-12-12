@@ -48,16 +48,14 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
         mRegistrationRequestInteraction.setLoginUpdating(true)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
+                mRegistrationRequestInteraction.setLoginUpdating(false)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     val body = response.body!!.string()
                     cookies = cookieManager.cookieStore.cookies
-                    mRegistrationRequestInteraction.setCSRFToken(cookies[0].value)
-                    mRegistrationRequestInteraction.setSessionId(cookies[1].value)
-                    mRegistrationRequestInteraction.setYourId(body.toLong())
+                    mRegistrationRequestInteraction.setCSRFTokenSessionIdAndId(cookies[0].value,cookies[1].value,body.toLong())
                     mRegistrationRequestInteraction.setMustSignIn(false)
                     mRegistrationRequestInteraction.setLoginUpdating(false)
                     mRegistrationRequestInteraction.addUserToDB(
@@ -210,5 +208,6 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
         fun setRegistrationSucceed(value: Boolean?)
         fun setResendStatus(value: RequestEnum)
         fun addUserToDB(user: User)
+        fun setCSRFTokenSessionIdAndId(csrfToken:String,sessionId: String,userId:Long)
     }
 }

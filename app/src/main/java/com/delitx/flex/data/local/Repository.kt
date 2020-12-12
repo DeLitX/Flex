@@ -43,12 +43,13 @@ class Repository private constructor(private val application: Application) :
     private val mUserDao: UserDao
     private val mCommentDao: CommentDao
     private val mChatMessageDao: ChatMessageDao
-    private val mChatWebsocket: ChatWebsocket = makeChatWebsocket()
+    private var mChatWebsocket: ChatWebsocket = makeChatWebsocket()
     private val mChatDao: ChatDao
     private val mDependenciesDao: DependenciesDao
     private val mAddUserDao: AddUserDao
     private val mDeleteUserDao: DeleteUserDao
-    val mainUser: LiveData<User>
+    var mainUser: LiveData<User>
+        private set
     var searchResult: MutableLiveData<List<User>>
     val isPasswordCanBeChanged: MutableLiveData<Boolean?>
     val isMustSignIn: MutableLiveData<Boolean?>
@@ -321,14 +322,14 @@ class Repository private constructor(private val application: Application) :
 
     suspend fun refreshUser(user: User) {
         val request = makeUserRequests()
-        request.viewUserInformation(user)
+        request.viewUserInformationAndSaveToDb(user.id)
     }
 
     suspend fun refreshMainUser() {
         val request = makeUserRequests()
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        request.viewUserInformation(User(sharedPreferences.getLong(MainData.YOUR_ID, 0)))
+        request.viewUserInformationAndSaveToDb(sharedPreferences.getLong(MainData.YOUR_ID, 0))
     }
 
     override fun setSessionId(sessionId: String) {
@@ -353,6 +354,20 @@ class Repository private constructor(private val application: Application) :
         val editor = sharedPreferences.edit()
         editor.putString(MainData.CRSFTOKEN, csrftoken)
         editor.apply()
+    }
+
+    override fun setCSRFTokenSessionIdAndId(csrfToken: String, sessionId: String, userId: Long) {
+        val sharedPreferences =
+            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(MainData.CRSFTOKEN, csrfToken)
+        editor.putString(MainData.SESSION_ID, sessionId)
+        editor.putLong(MainData.YOUR_ID,userId)
+        editor.apply()
+        CoroutineScope(Main).launch {
+            mChatWebsocket = makeChatWebsocket()
+            mainUser = mUserDao.getUser(userId)
+        }
     }
 
     fun downloadPhoto(link: String, photo: ImageView) {
@@ -693,7 +708,8 @@ class Repository private constructor(private val application: Application) :
     private fun getYourId(): Long {
         val sharedPreferences =
             application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sharedPreferences.getLong(MainData.YOUR_ID, 0)
+        val id = sharedPreferences.getLong(MainData.YOUR_ID, 0)
+        return id
     }
 
     override fun setFollowingCount(userId: Long, count: Long) {

@@ -20,28 +20,28 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class ChatAdapter(private val mChatInteraction: ChatInteraction) :
-    ListAdapter<BaseChatMessage,ChatAdapter.BaseChatViewHolder>(object :
+    ListAdapter<BaseChatMessage, ChatAdapter.BaseChatViewHolder>(object :
         DiffUtil.ItemCallback<BaseChatMessage>() {
         override fun areItemsTheSame(oldItem: BaseChatMessage, newItem: BaseChatMessage): Boolean {
-            return oldItem.time==newItem.time&&
-                    oldItem.byUser==newItem.byUser
+            return oldItem.time == newItem.time &&
+                    oldItem.byUser == newItem.byUser
         }
 
         override fun areContentsTheSame(
             oldItem: BaseChatMessage,
             newItem: BaseChatMessage
         ): Boolean {
-            var result=oldItem.time==newItem.time&&
-                    oldItem.byUser==newItem.byUser
-            if(oldItem is ChatMessage){
-                if(newItem is ChatMessage){
-                    result=result&&oldItem.isMy==newItem.isMy&&
-                            oldItem.sentStatus==newItem.sentStatus&&
-                            oldItem.text==newItem.text&&
-                            oldItem.userName==newItem.userName&&
-                            LinksUtils.comparePhotoLinks(oldItem.userImgLink,newItem.userImgLink)
-                }else{
-                    result=false
+            var result = oldItem.time == newItem.time &&
+                    oldItem.byUser == newItem.byUser
+            if (oldItem is ChatMessage) {
+                if (newItem is ChatMessage) {
+                    result = result && oldItem.isMy == newItem.isMy &&
+                            oldItem.sentStatus == newItem.sentStatus &&
+                            oldItem.text == newItem.text &&
+                            oldItem.userName == newItem.userName &&
+                            LinksUtils.comparePhotoLinks(oldItem.userImgLink, newItem.userImgLink)
+                } else {
+                    result = false
                 }
             }
             return result
@@ -105,7 +105,7 @@ class ChatAdapter(private val mChatInteraction: ChatInteraction) :
                         mUserWhoDeleted.text = mUserDeleted!!.name
                         if (mUserWasDeleted!!.size == 1) {
                             mUserWhoWasDeleted.text = mUserWasDeleted!![0].name
-                        } else if(mUserWasDeleted!!.isNotEmpty()){
+                        } else if (mUserWasDeleted!!.isNotEmpty()) {
                             mUserWhoWasDeleted.text =
                                 mUserWasDeleted!!.size.toString() + " users"  //TODO
                         }
@@ -153,7 +153,7 @@ class ChatAdapter(private val mChatInteraction: ChatInteraction) :
                         mUserWhoAdded.text = mUserAdded!!.name
                         if (mUserWasAdded!!.size == 1) {
                             mUserWhoWasAdded.text = mUserWasAdded!![0].name
-                        } else if(mUserWasAdded!!.isNotEmpty()){
+                        } else if (mUserWasAdded!!.isNotEmpty()) {
                             mUserWhoWasAdded.text =
                                 mUserWasAdded!!.size.toString() + " users" //TODO
                         }
@@ -187,7 +187,11 @@ class ChatAdapter(private val mChatInteraction: ChatInteraction) :
                 v.visibility = View.VISIBLE
                 messageText.text = item.text
                 val time = Date(item.time)
-                messageTime.text = "${time.hours}:${time.minutes}"
+                if (time.minutes < 10) {
+                    messageTime.text = "${time.hours}:0${time.minutes}"
+                }else{
+                    messageTime.text = "${time.hours}:${time.minutes}"
+                }
                 if (item.isMy) {
                     messageStatus.text = when (item.sentStatus) {
                         MessageSentEnum.SENDING -> {

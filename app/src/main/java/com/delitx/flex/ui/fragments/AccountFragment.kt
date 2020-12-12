@@ -23,6 +23,7 @@ import com.delitx.flex.pojo.User
 import com.delitx.flex.view_models.AccountViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_account.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -185,7 +186,14 @@ open class AccountFragment : Fragment(),
         if (!LinksUtils.comparePhotoLinks(userUrl, user.imageUrl)) {
             mAccountViewModel.downloadPhoto(user.imageUrl, avatar)
         }
-        userUrl=user.imageUrl
+        userUrl = user.imageUrl
+        if (layoutId == R.layout.fragment_account) {
+            button_follow.text = if (mUser!!.isSubscribed) {
+                getString(R.string.unfollow)
+            } else {
+                getString(R.string.follow)
+            }
+        }
     }
 
     override fun postScrollTo(postNumber: Int) {

@@ -191,6 +191,7 @@ class ChatActivity : AppCompatActivity(), ChatAdapter.ChatInteraction,
                 CoroutineScope(IO).launch {
                     setChatObserver(it)
                 }
+                mViewModel.loadMessages(it, 0)
             })
             val intent = intent
             mUserId = intent.getLongExtra(MainData.PUT_USER_ID, 0)

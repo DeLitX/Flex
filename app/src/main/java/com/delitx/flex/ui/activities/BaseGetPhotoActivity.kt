@@ -103,17 +103,12 @@ abstract class BaseGetPhotoActivity : AppCompatActivity() {
 
     fun takePicture() {
         mCanTakePhoto = (ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(
                     this,
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_GRANTED)
         if (Build.VERSION.SDK_INT >= 23 && (mCanTakePhoto == false)) {
             requestPermissions(
                 arrayOf(
-                    android.Manifest.permission.CAMERA,
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ), REQUEST_CAMERA_PERMISSION
             )
