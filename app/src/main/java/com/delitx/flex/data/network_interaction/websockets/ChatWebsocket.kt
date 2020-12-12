@@ -5,6 +5,7 @@ import android.util.Log
 import com.delitx.flex.Enums.ChatMessageTypes
 import com.delitx.flex.enums_.ChatConnectEnum
 import com.delitx.flex.MainData
+import com.delitx.flex.data.local.utils.LoginStateManager
 import com.delitx.flex.data.network_interaction.ChatMessageUtils
 import com.delitx.flex.pojo.AddUserMessage
 import com.delitx.flex.pojo.ChatMessage
@@ -21,9 +22,7 @@ import java.lang.Exception
 
 class ChatWebsocket(
     val mChatInteraction: ChatInteraction,
-    val csrftoken: String,
-    val sessionId: String,
-    private val mUserId: Long
+    private var mSessionDetails:LoginStateManager.SessionDetails
 ) {
     var user: String = ""
         private set
@@ -35,15 +34,18 @@ class ChatWebsocket(
     private var isSendHeartbeat = false
     private val heartbeatHandler = Handler()
     private val addQueue = mutableListOf<AddUserMessage>()
+    fun updateSessionDetails(sessionDetails:LoginStateManager.SessionDetails){
+        mSessionDetails=sessionDetails
+    }
 
     fun connectChat(chatId: Long, yourUserId: Long) {
-        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;chat_id=$chatId"
+        val cookie = "csrftoken=${mSessionDetails.csrfToken}; sessionid=${mSessionDetails.sessionId};id=$yourUserId;chat_id=$chatId"
         setThisChatId(chatId)
         connectWebsocket(cookie)
     }
 
     fun connectChat(user: String, yourUserId: Long) {
-        val cookie = "csrftoken=$csrftoken; sessionid=$sessionId;id=$yourUserId;username=$user"
+        val cookie = "csrftoken=${mSessionDetails.csrfToken}; sessionid=${mSessionDetails.sessionId};id=$yourUserId;username=$user"
         connectWebsocket(cookie)
     }
 
@@ -150,13 +152,13 @@ class ChatWebsocket(
     fun createChat(userId: Long) {
         val formBody = FormBody.Builder()
             .add("id", userId.toString())
-            .add("csrfmiddlewaretoken", csrftoken)
+            .add("csrfmiddlewaretoken", mSessionDetails.csrfToken)
             .build()
         val request = Request.Builder()
             .url("https://${MainData.BASE_URL}/${MainData.CHATROOM}/${MainData.CREATE_CHAT}")
             .post(formBody)
             .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
-            .addHeader("Cookie", "csrftoken=${csrftoken}; sessionid=${sessionId}")
+            .addHeader("Cookie", "csrftoken=${mSessionDetails.csrfToken}; sessionid=${mSessionDetails.sessionId}")
             .build()
         val call = client.newCall(request)
         call.enqueue(object : Callback {
@@ -233,7 +235,7 @@ class ChatWebsocket(
                 ChatMessageTypes.MESSAGE -> mChatInteraction.receiveMessage(
                     utils.decodeMessageFromWebsocket(
                         message,
-                        mUserId
+                        mSessionDetails.userId
                     )
                 )
                 ChatMessageTypes.DELETE_USER -> {
@@ -245,7 +247,7 @@ class ChatWebsocket(
                     )
                     mChatInteraction.deleteUsersFromChat(deleteUserMessage.toDependencies())
                     for(i in deleteUserMessage.userIds){
-                        if(i==mUserId){
+                        if(i==mSessionDetails.userId){
                             closeWebsocket()
                             break
                             //TODO close chat window

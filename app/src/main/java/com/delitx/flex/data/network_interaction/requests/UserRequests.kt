@@ -17,39 +17,6 @@ class UserRequests(
     private val csrftoken: String,
     private val sessionId: String
 ) : BaseRequestFunctionality() {
-    fun testNotification() {
-        val urlHttp = HttpUrl.Builder().scheme("https")
-            .host(MainData.BASE_URL)
-            .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
-            .addPathSegment("test_fcm")
-            .build()
-        val request = Request.Builder().url(urlHttp)
-            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
-            .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
-            .build()
-        val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                if (true) {
-
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    CoroutineScope(IO).launch {
-                        val body = response.body?.string()
-                        if (body != null) {
-                        }
-                    }
-                } else if (response.code == MainData.ERR_403) {
-                    mUserRequestsInteraction.setMustSignIn(true)
-                } else {
-                    mUserRequestsInteraction.setErrorText(response.body?.string())
-                }
-            }
-        })
-    }
 
     fun viewAcc(userId: Long, actualUser: User?) {
         val formBody = FormBody.Builder()

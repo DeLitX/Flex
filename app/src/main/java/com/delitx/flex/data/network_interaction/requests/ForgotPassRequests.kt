@@ -25,7 +25,7 @@ class ForgotPassRequests(private val mInteraction:ForgotPassInteraction):BaseReq
         }
     }
 
-    fun forgotPass(email: String,isCanBeChanged:MutableLiveData<Boolean?>) {
+    suspend fun forgotPass(email: String):Boolean {
         val formBody = FormBody.Builder()
             .add("email", email)
             .build()
@@ -37,22 +37,11 @@ class ForgotPassRequests(private val mInteraction:ForgotPassInteraction):BaseReq
                 .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
                 .build()
         val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    CoroutineScope(Main).launch {
-                        isCanBeChanged.value=true
-                    }
-                }
-            }
-        })
+        val response=call.execute()
+        return response.isSuccessful
     }
 
-    fun changePass(email: String, newPass: String, checkCode: String) {
+    suspend fun changePass(email: String, newPass: String, checkCode: String):Boolean {
         val formBody = FormBody.Builder()
             .add("email", email)
             .add("new_password", newPass)
@@ -66,17 +55,8 @@ class ForgotPassRequests(private val mInteraction:ForgotPassInteraction):BaseReq
                 .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
                 .build()
         val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    //TODO
-                }
-            }
-        })
+        val response=call.execute()
+        return response.isSuccessful
     }
     interface ForgotPassInteraction{
         fun changeForgotPassState(state:RequestEnum)

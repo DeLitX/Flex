@@ -1,8 +1,9 @@
 package com.delitx.flex.data.network_interaction.requests
 
-import android.util.Log
 import com.delitx.flex.enums_.RequestEnum
 import com.delitx.flex.MainData
+import com.delitx.flex.data.local.utils.LoginStateManager
+import com.delitx.flex.data.network_interaction.UnsuccessfulRequestException
 import com.delitx.flex.pojo.User
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +32,7 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
         this.mSessionId = ""
     }
 
-    fun login(password: String, login: String) {
+    suspend fun login(password: String, login: String): LoginStateManager.SessionDetails {
         var cookies: List<HttpCookie>
         val formBody = FormBody.Builder()
             .add("password", password)
@@ -45,34 +46,21 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
             .build()
 
         val call = client.newCall(request)
-        mRegistrationRequestInteraction.setLoginUpdating(true)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                mRegistrationRequestInteraction.setLoginUpdating(false)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val body = response.body!!.string()
-                    cookies = cookieManager.cookieStore.cookies
-                    mRegistrationRequestInteraction.setCSRFTokenSessionIdAndId(cookies[0].value,cookies[1].value,body.toLong())
-                    mRegistrationRequestInteraction.setMustSignIn(false)
-                    mRegistrationRequestInteraction.setLoginUpdating(false)
-                    mRegistrationRequestInteraction.addUserToDB(
-                        User(
-                            id = body.toLong(),
-                            name = login
-                        )
-                    )
-                } else {
-                    mRegistrationRequestInteraction.setLoginUpdating(false)
-                }
-            }
-        })
+        val response = call.execute()
+        if (response.isSuccessful) {
+            val body = response.body!!.string()
+            cookies = cookieManager.cookieStore.cookies
+            return LoginStateManager.SessionDetails(
+                body.toLong(),
+                cookies[0].value,
+                cookies[1].value
+            )
+        } else {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun logout() {
-        var cookies: List<HttpCookie>
+    suspend fun logout():Boolean {
         val urlHttp = HttpUrl.Builder().scheme("https")
             .host(MainData.BASE_URL)
             .addPathSegment(MainData.URL_PREFIX_ACC_BASE)
@@ -86,23 +74,8 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
             .build()
 
         val call = client.newCall(request)
-
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    CoroutineScope(IO).launch {
-                        cookies = cookieManager.cookieStore.cookies
-                        mRegistrationRequestInteraction.setMustSignIn(true)
-                    }
-                } else {
-
-                }
-            }
-        })
+        val response = call.execute()
+        return response.isSuccessful
     }
 
     fun resendEmail(userId: Long, email: String) {
@@ -133,40 +106,8 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
         })
     }
 
-    fun checkLog() {
-        var cookies: List<HttpCookie>
-        val urlHttp = HttpUrl.Builder().scheme("https")
-            .host(MainData.BASE_URL)
-            .addPathSegment(MainData.URL_PREFIX_ACC_BASE)
-            .addPathSegment(MainData.CHECK_LOG).build()
-        val request = Request.Builder().url(urlHttp)
-            .tag(MainData.TAG_CHECKLOG)
-            .addHeader(MainData.HEADER_REFRER, "https://" + MainData.BASE_URL)
-            //.addHeader("Authorization",sessionId )
-            .addHeader("Cookie", "csrftoken=$mCsrftoken; sessionid=$mSessionId")
-            .addHeader("Host", MainData.BASE_URL)
-            .addHeader("Content-Type", "application/x-www-form-urlencoded")
-            .build()
 
-        val call = client.newCall(request)
-
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                //cookies.add(HttpCookie("you failed","you failed"))
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    cookies = cookieManager.cookieStore.cookies
-                } else if (response.code == MainData.ERR_403) {
-                } else {
-
-                }
-            }
-        })
-    }
-
-    fun register(password: String, login: String, email: String) {
+    suspend fun register(password: String, login: String, email: String) {
         val formBody = FormBody.Builder()
             .add("password", password)
             .add("username", login)
@@ -180,34 +121,18 @@ class RegistRequests(private val mRegistrationRequestInteraction: RegistrationRe
             .build()
         val call = client.newCall(request)
         mRegistrationRequestInteraction.setRegisterUpdating(true)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                mRegistrationRequestInteraction.setRegistrationSucceed(false)
-                mRegistrationRequestInteraction.setRegisterUpdating(false)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    mRegistrationRequestInteraction.setRegisterUpdating(false)
-                    mRegistrationRequestInteraction.setRegistrationSucceed(true)
-                } else {
-                    mRegistrationRequestInteraction.setRegistrationSucceed(false)
-                    mRegistrationRequestInteraction.setRegisterUpdating(false)
-                }
-            }
-        })
+        val response=call.execute()
+        if(!response.isSuccessful){
+            throw UnsuccessfulRequestException()
+        }
     }
 
     interface RegistrationRequestInteraction {
-        fun setCSRFToken(csrftoken: String)
-        fun setSessionId(sessionId: String)
-        fun setYourId(id: Long)
         fun setMustSignIn(value: Boolean)
         fun setLoginUpdating(value: Boolean)
         fun setRegisterUpdating(value: Boolean)
         fun setRegistrationSucceed(value: Boolean?)
         fun setResendStatus(value: RequestEnum)
         fun addUserToDB(user: User)
-        fun setCSRFTokenSessionIdAndId(csrfToken:String,sessionId: String,userId:Long)
     }
 }

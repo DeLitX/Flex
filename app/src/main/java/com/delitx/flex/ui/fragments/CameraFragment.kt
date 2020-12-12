@@ -49,14 +49,10 @@ class CameraFragment : Fragment() {
         val btnLogout = v.findViewById<Button>(R.id.button_logout)
         val changePassBtn = v.findViewById<Button>(R.id.button_change_pass)
         val makePostBtn = v.findViewById<Button>(R.id.button_make_post)
-        val testNotificationBtn = v.findViewById<Button>(R.id.button_test_notification)
         val email: EditText = v.findViewById(R.id.email)
         val resendEmail: Button = v.findViewById(R.id.resend_email)
         resendEmail.setOnClickListener {
             mViewModel.resendEmail(email.text.trim().toString())
-        }
-        testNotificationBtn.setOnClickListener {
-            mViewModel.testNotification()
         }
         makePostBtn.setOnClickListener {
             val intent = Intent(this.context, MakePostActivity::class.java)

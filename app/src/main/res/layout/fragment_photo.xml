@@ -27,19 +27,12 @@
         android:background="@drawable/main_app_buttons"
         android:text="@string/make_post" />
 
-    <Button
-        android:id="@+id/button_test_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_change_pass"
-        android:background="@drawable/main_app_buttons"
-        android:text="Test notification" />
 
     <EditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button_test_notification"
+        android:layout_below="@id/button_make_post"
         android:layout_margin="@dimen/margin_border" />
 
     <Button

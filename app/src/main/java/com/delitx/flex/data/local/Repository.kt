@@ -13,6 +13,8 @@ import androidx.lifecycle.MutableLiveData
 import com.delitx.flex.MainData
 import com.delitx.flex.R
 import com.delitx.flex.data.local.data_base.*
+import com.delitx.flex.data.local.utils.LoginStateManager
+import com.delitx.flex.data.network_interaction.UnsuccessfulRequestException
 import com.delitx.flex.data.network_interaction.requests.PostRequests
 import com.delitx.flex.data.network_interaction.requests.*
 import com.delitx.flex.data.network_interaction.websockets.ChatInteraction
@@ -113,6 +115,10 @@ class Repository private constructor(private val application: Application) :
         resendEmailStatus = MutableLiveData(RequestEnum.UNDEFINED)
     }
 
+    fun updateWebsocketSessionDetails(sessionDetails: LoginStateManager.SessionDetails) {
+        mChatWebsocket.updateSessionDetails(sessionDetails)
+    }
+
     suspend fun generateChatInviteLink(chatId: Long): Boolean {
         return makeChatRequest().createGroupInvite(chatId)
     }
@@ -146,7 +152,7 @@ class Repository private constructor(private val application: Application) :
     fun addUsersToChat(ids: List<Long>, chatId: Long) {
         val message = AddUserMessage(
             time = Calendar.getInstance().timeInMillis,
-            userIds = ids, byUser = getYourId(), belongsToChat = chatId
+            userIds = ids, byUser = getSessionDetails().userId, belongsToChat = chatId
         )
         mAddUserDao.insert(message)
         mDependenciesDao.insert(message.toDependencies())
@@ -158,13 +164,13 @@ class Repository private constructor(private val application: Application) :
     }
 
     fun resendEmail(email: String) {
-        makeRegistRequest().resendEmail(getYourId(), email)
+        makeRegistRequest().resendEmail(getSessionDetails().userId, email)
     }
 
     fun removeUsersFromChat(ids: List<Long>, chatId: Long) {
         val message = DeleteUserMessage(
             time = Calendar.getInstance().timeInMillis,
-            userIds = ids, byUser = getYourId(), belongsToChat = chatId
+            userIds = ids, byUser = getSessionDetails().userId, belongsToChat = chatId
         )
         mDeleteUserDao.insert(message)
         mDependenciesDao.delete(message.toDependencies())
@@ -187,14 +193,8 @@ class Repository private constructor(private val application: Application) :
         return mChatDao.getChat(chatId)
     }
 
-    fun testNotification() {
-        makeUserRequests().testNotification()
-    }
-
     fun deleteAllUserData() {
-        setCSRFToken("")
-        setSessionId("")
-        setYourId(0)
+        LoginStateManager(application).saveLoginDetails(LoginStateManager.SessionDetails(0, "", ""))
         clearDatabase()
     }
 
@@ -213,14 +213,14 @@ class Repository private constructor(private val application: Application) :
 
     fun createChat(users: MutableList<Long>, chatName: String) {
         CoroutineScope(IO).launch {
-            users.add(getYourId())
+            users.add(getSessionDetails().userId)
             makeChatRequest().createGroupChat(users, chatName)
         }
     }
 
     fun createChat(users: MutableList<Long>, chatName: String, chatPhoto: File) {
         CoroutineScope(IO).launch {
-            users.add(getYourId())
+            users.add(getSessionDetails().userId)
             makeChatRequest().createGroupChat(users, chatName, chatPhoto)
         }
     }
@@ -244,7 +244,7 @@ class Repository private constructor(private val application: Application) :
             val message = ChatMessage(
                 text = text,
                 isMy = true,
-                byUser = getYourId(),
+                byUser = getSessionDetails().userId,
                 userImgLink = user.imageUrl,
                 userName = user.name,
                 belongsToChat = mChatWebsocket.chatId,
@@ -260,7 +260,7 @@ class Repository private constructor(private val application: Application) :
 
     fun loadMessages(chatId: Long, idOfLast: Long) {
         val request = makeChatRequest()
-        request.loadMessages(chatId, idOfLast, getYourId())
+        request.loadMessages(chatId, idOfLast, getSessionDetails().userId)
     }
 
     fun refreshCommentsForPost(postId: Long) {
@@ -332,43 +332,6 @@ class Repository private constructor(private val application: Application) :
         request.viewUserInformationAndSaveToDb(sharedPreferences.getLong(MainData.YOUR_ID, 0))
     }
 
-    override fun setSessionId(sessionId: String) {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString(MainData.SESSION_ID, sessionId)
-        editor.apply()
-    }
-
-    override fun setYourId(id: Long) {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putLong(MainData.YOUR_ID, id)
-        editor.apply()
-    }
-
-    override fun setCSRFToken(csrftoken: String) {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString(MainData.CRSFTOKEN, csrftoken)
-        editor.apply()
-    }
-
-    override fun setCSRFTokenSessionIdAndId(csrfToken: String, sessionId: String, userId: Long) {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString(MainData.CRSFTOKEN, csrfToken)
-        editor.putString(MainData.SESSION_ID, sessionId)
-        editor.putLong(MainData.YOUR_ID,userId)
-        editor.apply()
-        CoroutineScope(Main).launch {
-            mChatWebsocket = makeChatWebsocket()
-            mainUser = mUserDao.getUser(userId)
-        }
-    }
 
     fun downloadPhoto(link: String, photo: ImageView) {
         //TODO cache images
@@ -461,50 +424,6 @@ class Repository private constructor(private val application: Application) :
         }
     }
 
-    fun checkLog() {
-        CoroutineScope(IO).launch {
-            checkLogAsync()
-        }
-    }
-
-    fun login(login: String, password: String) {
-        CoroutineScope(IO).launch {
-            loginAsync(login, password)
-        }
-    }
-
-    fun register(email: String, login: String, password: String) {
-        CoroutineScope(IO).launch {
-            registerAsync(
-                email = email,
-                login = login,
-                password = password
-            )
-        }
-    }
-
-    fun logout() {
-        CoroutineScope(IO).launch {
-            logoutAsync()
-        }
-    }
-
-    fun changePassword(email: String, newPassword: String, checkCode: String) {
-        CoroutineScope(IO).launch {
-            changePasswordAsync(
-                email = email,
-                newPassword = newPassword,
-                checkCode = checkCode
-            )
-        }
-    }
-
-    fun forgotPassword(email: String) {
-        CoroutineScope(IO).launch {
-            forgotPasswordAsync(email)
-        }
-    }
-
     fun unfollowUser(userId: Long) {
         CoroutineScope(IO).launch {
             unfollow(userId)
@@ -522,7 +441,7 @@ class Repository private constructor(private val application: Application) :
     }
 
     suspend fun getMainUser(): User {
-        val id = getYourId()
+        val id = getSessionDetails().userId
         var user = getUserValueFromDB(id)
         return user
     }
@@ -544,12 +463,12 @@ class Repository private constructor(private val application: Application) :
     }
 
 
-    private suspend fun forgotPasswordAsync(email: String) {
+    suspend fun forgotPassword(email: String) {
         val request = ForgotPassRequests(this)
-        request.forgotPass(email, isPasswordCanBeChanged)
+        isPasswordCanBeChanged.postValue(request.forgotPass(email))
     }
 
-    private suspend fun changePasswordAsync(email: String, newPassword: String, checkCode: String) {
+    suspend fun changePassword(email: String, newPassword: String, checkCode: String) {
         val request = ForgotPassRequests(this)
         request.changePass(
             email = email,
@@ -558,29 +477,38 @@ class Repository private constructor(private val application: Application) :
         )
     }
 
-    private suspend fun logoutAsync() {
+    suspend fun logout() {
         val request = makeRegistRequest()
-        request.logout()
+        setMustSignIn(request.logout())
     }
 
-    private suspend fun registerAsync(email: String, login: String, password: String) {
+    suspend fun register(email: String, login: String, password: String): Boolean {
         val request = makeRegistRequest()
-        request.register(
-            email = email,
-            login = login,
-            password = password
-        )
+        return try {
+            request.register(
+                email = email,
+                login = login,
+                password = password
+            )
+            true
+        } catch (e: UnsuccessfulRequestException) {
+            false
+        }
     }
 
-    private suspend fun loginAsync(login: String, password: String) {
+    suspend fun login(login: String, password: String): LoginStateManager.SessionDetails {
         val request = makeRegistRequest()
-        request.login(login = login, password = password)
+        var loginDetails: LoginStateManager.SessionDetails
+        try {
+            loginDetails = request.login(login = login, password = password)
+        } catch (e: UnsuccessfulRequestException) {
+            setMustSignIn(true)
+            throw e
+        }
+        setMustSignIn(false)
+        return loginDetails
     }
 
-    private suspend fun checkLogAsync() {
-        val request = makeRegistRequest()
-        request.checkLog()
-    }
 
     private suspend fun searchAsync(query: String) {
         val request = makeSearchRequest()
@@ -642,38 +570,36 @@ class Repository private constructor(private val application: Application) :
     }
 
     private fun makeChatWebsocket(): ChatWebsocket {
-        val pair = getCSRFTokenAndSessionId()
-        val id = getYourId()
-        return ChatWebsocket(this, pair.first, pair.second, id)
+        val sessionDetails = getSessionDetails()
+        return ChatWebsocket(this, sessionDetails)
     }
 
     private fun makePostRequests(): PostRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return PostRequests(this, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return PostRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makeUploadFileRequests(): UploadFileRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return UploadFileRequests(isMustSignIn, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return UploadFileRequests(isMustSignIn, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makeUserRequests(): UserRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return UserRequests(this, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return UserRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makeSearchRequest(): SearchRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return SearchRequests(this, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return SearchRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makeRegistRequest(): RegistRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return RegistRequests(this, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return RegistRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makePhotoRequest(): PhotoRequests {
-        val pair = getCSRFTokenAndSessionId()
         val httpCacheDirectory = File(application.applicationContext.cacheDir, "http-cache")
         val cacheSize: Long = getFreeDiscSpace() / 20
         val cache = Cache(httpCacheDirectory, cacheSize)
@@ -681,35 +607,12 @@ class Repository private constructor(private val application: Application) :
     }
 
     private fun makeChatRequest(): ChatRequests {
-        val pair = getCSRFTokenAndSessionId()
-        return ChatRequests(this, pair.first, pair.second)
+        val sessionDetails = getSessionDetails()
+        return ChatRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
-    private fun getCSRFToken(): String {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sharedPreferences.getString(MainData.CRSFTOKEN, "") ?: ""
-    }
-
-    private fun getSessionId(): String {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sharedPreferences.getString(MainData.SESSION_ID, "") ?: ""
-    }
-
-    private fun getCSRFTokenAndSessionId(): Pair<String, String> {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val sessionId = sharedPreferences.getString(MainData.SESSION_ID, "")
-        val csrftoken = sharedPreferences.getString(MainData.CRSFTOKEN, "")
-        return Pair(csrftoken ?: "", sessionId ?: "")
-    }
-
-    private fun getYourId(): Long {
-        val sharedPreferences =
-            application.getSharedPreferences(MainData.SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val id = sharedPreferences.getLong(MainData.YOUR_ID, 0)
-        return id
+    private fun getSessionDetails(): LoginStateManager.SessionDetails {
+        return LoginStateManager(application).getSessionDetails()
     }
 
     override fun setFollowingCount(userId: Long, count: Long) {
