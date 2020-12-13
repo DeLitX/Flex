@@ -1,23 +1,28 @@
 package com.delitx.flex.data.network_interaction.requests
 
 import com.delitx.flex.MainData
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
+import com.delitx.flex.data.network_interaction.exceptions.UserNotLoginedException
 import com.delitx.flex.pojo.Comment
 import com.delitx.flex.pojo.Post
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import java.net.SocketTimeoutException
 
 class PostRequests(
-    private val mPostRequestsInteraction: PostRequestsInteraction,
     private var csrftoken: String,
     private var sessionId: String
 ) : BaseRequestFunctionality() {
 
-    fun unLikePost(post: Post) {
+    suspend fun unLikePost(post: Post) {
         val formBody = FormBody.Builder()
             .add("id", post.id.toString())
             .add("csrfmiddlewaretoken", csrftoken)
@@ -30,23 +35,21 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
 
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
+            } else {
+                throw UnsuccessfulRequestException()
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    mPostRequestsInteraction.updatePost(post)
-                } else if (response.code == MainData.ERR_403) {
-                    makeUserSignIn()
-                }
-            }
-        })
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun likePost(post: Post) {
+    suspend fun likePost(post: Post) {
         val formBody = FormBody.Builder()
             .add("id", post.id.toString())
             .add("csrfmiddlewaretoken", csrftoken)
@@ -59,22 +62,21 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
 
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
+            } else {
+                throw UnsuccessfulRequestException()
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    mPostRequestsInteraction.updatePost(post)
-                } else if (response.code == MainData.ERR_403) {
-                    makeUserSignIn()
-                }
-            }
-        })
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun commentPost(postId: Long, commentText: String) {
+    suspend fun commentPost(postId: Long, commentText: String) {
         val formBody = FormBody.Builder()
             .add("id", postId.toString())
             .add("comment", commentText)
@@ -88,23 +90,21 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
 
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
+            } else {
+                throw UnsuccessfulRequestException()
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-
-                } else if (response.code == MainData.ERR_403) {
-                    makeUserSignIn()
-                }
-            }
-        })
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun viewAllPostsAccount(id: Long) {
+    suspend fun viewAllPostsAccount(id: Long): List<Post> {
         val formBody = FormBody.Builder()
             .add("id", id.toString())
             .add("csrfmiddlewaretoken", csrftoken)
@@ -117,58 +117,53 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
-
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    CoroutineScope(IO).launch {
-                        val body = response.body?.string()
-                        if (body != null) {
-                            val jsonObject = JSONObject(body)
-                            val keys = jsonObject.keys()
-                            val idOfUser = jsonObject["isMyUser"]
-                            //val isSubscribed=jsonObject["isSubscribed"]
-                            //val userName=jsonObject["name"]
-                            val postsList = jsonObject["posts"]
-                            val listOfPosts = mutableListOf<Post>()
-                            if (postsList is JSONArray) {
-                                val length = postsList.length()
-                                for (i in 0 until length) {
-                                    val value = postsList[i]
-                                    if (value is JSONObject)
-                                        listOfPosts.add(
-                                            Post(
-                                                id = value["post_id"].toString().toLong(),
-                                                imageUrl = value["src"].toString(),
-                                                date = value["date"].toString().toLong(),
-                                                postText = value["description"].toString(),
-                                                countOfFires = value["likes"].toString().toLong(),
-                                                countOfComments = value["comments"].toString()
-                                                    .toLong(),
-                                                //imageUrlMini = value["src_mini"].toString(),
-                                                isLiked = value["isLiked"].toString().toBoolean(),
-                                                belongsTo = id
-                                            )
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string()
+                if (body != null) {
+                    val listOfPosts = mutableListOf<Post>()
+                    withContext(Default) {
+                        val jsonObject = JSONObject(body)
+                        val keys = jsonObject.keys()
+                        val idOfUser = jsonObject["isMyUser"]
+                        //val isSubscribed=jsonObject["isSubscribed"]
+                        //val userName=jsonObject["name"]
+                        val postsList = jsonObject["posts"]
+                        if (postsList is JSONArray) {
+                            val length = postsList.length()
+                            for (i in 0 until length) {
+                                val value = postsList[i]
+                                if (value is JSONObject)
+                                    listOfPosts.add(
+                                        Post(
+                                            id = value["post_id"].toString().toLong(),
+                                            imageUrl = value["src"].toString(),
+                                            date = value["date"].toString().toLong(),
+                                            postText = value["description"].toString(),
+                                            countOfFires = value["likes"].toString().toLong(),
+                                            countOfComments = value["comments"].toString()
+                                                .toLong(),
+                                            //imageUrlMini = value["src_mini"].toString(),
+                                            isLiked = value["isLiked"].toString().toBoolean(),
+                                            belongsTo = id
                                         )
-                                }
+                                    )
                             }
-                            mPostRequestsInteraction.savePostsToDb(listOfPosts)
                         }
                     }
-                } else if (response.code == MainData.ERR_403) {
-                    makeUserSignIn()
-                } else {
-
+                    return listOfPosts
                 }
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
             }
-        })
+            throw UnsuccessfulRequestException()
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun viewAllPostsHome(lastId: Long) {
+    suspend fun viewAllPostsHome(lastId: Long): List<Post> {
         val formBody = HttpUrl.Builder().scheme("https")
             .host(MainData.BASE_URL)
             .addPathSegment(MainData.URL_PREFIX_HOME)
@@ -182,58 +177,51 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
-
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                if (true) {
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    CoroutineScope(IO).launch {
-                        val body = response.body?.string()
-                        if (body != null) {
-                            val jsonObject = JSONObject(body)
-                            val keys = jsonObject.keys()
-                            val postsList = jsonObject["posts"]
-                            val listOfPosts = mutableListOf<Post>()
-                            if (postsList is JSONArray) {
-                                val length = postsList.length()
-                                for (i in 0 until length) {
-                                    val value = postsList[i]
-                                    if (value is JSONObject)
-                                        listOfPosts.add(
-                                            Post(
-                                                id = value["id"].toString().toLong(),
-                                                imageUrl = value["src"].toString(),
-                                                date = value["date"].toString().toLong(),
-                                                postText = value["description"].toString(),
-                                                countOfFires = value["likes"].toString()
-                                                    .toLong(),
-                                                countOfComments = value["comments"].toString()
-                                                    .toLong(),
-                                                isLiked = value["isLiked"].toString().toBoolean(),
-                                                belongsTo = value["user_id"].toString().toLong(),
-                                                showInFeed = true
-                                            )
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string()
+                if (body != null) {
+                    val listOfPosts = mutableListOf<Post>()
+                    withContext(Default) {
+                        val jsonObject = JSONObject(body)
+                        val keys = jsonObject.keys()
+                        val postsList = jsonObject["posts"]
+                        if (postsList is JSONArray) {
+                            val length = postsList.length()
+                            for (i in 0 until length) {
+                                val value = postsList[i]
+                                if (value is JSONObject)
+                                    listOfPosts.add(
+                                        Post(
+                                            id = value["id"].toString().toLong(),
+                                            imageUrl = value["src"].toString(),
+                                            date = value["date"].toString().toLong(),
+                                            postText = value["description"].toString(),
+                                            countOfFires = value["likes"].toString()
+                                                .toLong(),
+                                            countOfComments = value["comments"].toString()
+                                                .toLong(),
+                                            isLiked = value["isLiked"].toString().toBoolean(),
+                                            belongsTo = value["user_id"].toString().toLong(),
+                                            showInFeed = true
                                         )
-                                }
+                                    )
                             }
-                            mPostRequestsInteraction.savePostsToDb(listOfPosts)
-                            mPostRequestsInteraction.setFeedRefreshState(false)
                         }
                     }
-                } else if (response.code == MainData.ERR_403) {
-                    makeUserSignIn()
-                } else {
-
+                    return listOfPosts
                 }
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
             }
-        })
+            throw UnsuccessfulRequestException()
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
+        }
     }
 
-    fun viewCommentsToPost(postId: Long) {
+    suspend fun viewCommentsToPost(postId: Long): List<Comment> {
         val formBody = HttpUrl.Builder().scheme("https")
             .host(MainData.BASE_URL)
             .addPathSegment(MainData.URL_PREFIX_USER_PROFILE)
@@ -246,61 +234,43 @@ class PostRequests(
             .addHeader("Cookie", "csrftoken=$csrftoken; sessionid=$sessionId")
             .build()
         val call = client.newCall(request)
-
-        val tempCoroutine = CoroutineScope(IO).launch {
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        CoroutineScope(IO).launch {
-                            val body = response.body?.string()
-                            if (body != null) {
-                                val jsonObject = JSONObject(body)
-                                val keys = jsonObject.keys()
-                                val commentsList = jsonObject["comments"]
-                                val listOfComments = mutableListOf<Comment>()
-                                if (commentsList is JSONArray) {
-                                    val length = commentsList.length()
-                                    for (i in 0 until length) {
-                                        val value = commentsList[i]
-                                        if (value is JSONObject)
-                                            listOfComments.add(
-                                                Comment(
-                                                    id = value["comment_id"].toString().toLong(),
-                                                    userId = value["sender_id"].toString().toLong(),
-                                                    text = value["description"].toString(),
-                                                    timeSended = value["time"].toString()
-                                                        .toLong(),
-                                                    belongsToPost = postId
-                                                )
-                                            )
-                                    }
-                                }
-                                mPostRequestsInteraction.saveCommentsToDb(listOfComments)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string()
+                if (body != null) {
+                    val listOfComments = mutableListOf<Comment>()
+                    withContext(Default) {
+                        val jsonObject = JSONObject(body)
+                        val keys = jsonObject.keys()
+                        val commentsList = jsonObject["comments"]
+                        if (commentsList is JSONArray) {
+                            val length = commentsList.length()
+                            for (i in 0 until length) {
+                                val value = commentsList[i]
+                                if (value is JSONObject)
+                                    listOfComments.add(
+                                        Comment(
+                                            id = value["comment_id"].toString().toLong(),
+                                            userId = value["sender_id"].toString().toLong(),
+                                            text = value["description"].toString(),
+                                            timeSended = value["time"].toString()
+                                                .toLong(),
+                                            belongsToPost = postId
+                                        )
+                                    )
                             }
                         }
-                    } else if (response.code == MainData.ERR_403) {
-                        makeUserSignIn()
-                    } else {
-
                     }
+                    return listOfComments
                 }
-            })
+            } else if (response.code == MainData.ERR_403) {
+                throw UserNotLoginedException()
+            }
+            throw UnsuccessfulRequestException()
+        } catch (e: SocketTimeoutException) {
+            throw UnsuccessfulRequestException()
         }
     }
 
-    private fun makeUserSignIn() {
-        mPostRequestsInteraction.setMustSignIn(true)
-    }
-
-    interface PostRequestsInteraction {
-        fun setMustSignIn(value: Boolean)
-        fun savePostsToDb(posts: List<Post>)
-        fun saveCommentsToDb(comments: List<Comment>)
-        fun updatePost(post: Post)
-        fun setFeedRefreshState(value: Boolean)
-    }
 }

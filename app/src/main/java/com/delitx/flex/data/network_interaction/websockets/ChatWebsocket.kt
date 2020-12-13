@@ -6,7 +6,7 @@ import com.delitx.flex.Enums.ChatMessageTypes
 import com.delitx.flex.enums_.ChatConnectEnum
 import com.delitx.flex.MainData
 import com.delitx.flex.data.local.utils.LoginStateManager
-import com.delitx.flex.data.network_interaction.ChatMessageUtils
+import com.delitx.flex.data.network_interaction.utils.ChatMessageUtils
 import com.delitx.flex.pojo.AddUserMessage
 import com.delitx.flex.pojo.ChatMessage
 import com.delitx.flex.pojo.DeleteUserMessage

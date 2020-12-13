@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.delitx.flex.pojo.User
 import com.delitx.flex.R
-import com.delitx.flex.data.network_interaction.LinksUtils
+import com.delitx.flex.data.network_interaction.utils.LinksUtils
 
 class MiniUserGridAdapter(private val mIntercation: ImageDownload) :
     ListAdapter<User, MiniUserGridAdapter.MiniUserViewHolder>(object :

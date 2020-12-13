@@ -1,4 +1,4 @@
-package com.delitx.flex.data.network_interaction
+package com.delitx.flex.data.network_interaction.utils
 
 import com.delitx.flex.Enums.ChatMessageTypes
 import com.delitx.flex.enums_.MessageSentEnum

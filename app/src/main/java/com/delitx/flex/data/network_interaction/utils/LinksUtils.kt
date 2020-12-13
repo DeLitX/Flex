@@ -1,4 +1,4 @@
-package com.delitx.flex.data.network_interaction
+package com.delitx.flex.data.network_interaction.utils
 
 class LinksUtils {
     companion object{

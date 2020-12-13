@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.delitx.flex.data.local.utils.LoginStateManager
-import com.delitx.flex.data.network_interaction.UnsuccessfulRequestException
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
 import com.delitx.flex.enums_.RequestEnum
 import com.delitx.flex.pojo.Comment
 import com.delitx.flex.pojo.Post
@@ -12,11 +12,7 @@ import com.delitx.flex.pojo.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
 import java.io.File
-import java.io.IOException
 
 class AccountViewModel(private val app: Application) : BaseViewModel(app) {
     val allPosts: LiveData<List<Post>>
@@ -95,11 +91,15 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
     }
 
     fun unLikePost(post: Post) {
-        mRepository.unLikePost(post)
+        CoroutineScope(IO).launch {
+            mRepository.unLikePost(post)
+        }
     }
 
     fun likePost(post: Post) {
-        mRepository.likePost(post)
+        CoroutineScope(IO).launch {
+            mRepository.likePost(post)
+        }
     }
 
     fun getMainUser(): LiveData<User> {
@@ -111,7 +111,9 @@ class AccountViewModel(private val app: Application) : BaseViewModel(app) {
     }
 
     fun getPostsForAcc(id: Long) {
-        mRepository.getPostsForAcc(id)
+        CoroutineScope(IO).launch {
+            mRepository.getPostsForAcc(id)
+        }
     }
 
     fun uploadPost(file: File, description: String) {

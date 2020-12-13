@@ -1,20 +1,17 @@
 package com.delitx.flex.data.local
 
 import android.app.Application
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.delitx.flex.MainData
-import com.delitx.flex.R
 import com.delitx.flex.data.local.data_base.*
 import com.delitx.flex.data.local.utils.LoginStateManager
-import com.delitx.flex.data.network_interaction.UnsuccessfulRequestException
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
+import com.delitx.flex.data.network_interaction.exceptions.UserNotLoginedException
 import com.delitx.flex.data.network_interaction.requests.PostRequests
 import com.delitx.flex.data.network_interaction.requests.*
 import com.delitx.flex.data.network_interaction.websockets.ChatInteraction
@@ -26,7 +23,6 @@ import com.delitx.flex.pojo.*
 import com.delitx.flex.view_models.MixedChatLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import okhttp3.Cache
 import java.io.File
@@ -34,8 +30,7 @@ import java.util.*
 
 
 class Repository private constructor(private val application: Application) :
-    UserRequests.UserRequestsInteraction,
-    PostRequests.PostRequestsInteraction, RegistRequests.RegistrationRequestInteraction,
+    UserRequests.UserRequestsInteraction, RegistRequests.RegistrationRequestInteraction,
     ChatInteraction,
     ChatRequests.ChatRoomInteraction, SearchRequests.SearchInteraction,
     ForgotPassRequests.ForgotPassInteraction {
@@ -119,7 +114,7 @@ class Repository private constructor(private val application: Application) :
         mChatWebsocket.updateSessionDetails(sessionDetails)
     }
 
-    suspend fun generateChatInviteLink(chatId: Long): Boolean {
+    suspend fun generateChatInviteLink(chatId: Long): String {
         return makeChatRequest().createGroupInvite(chatId)
     }
 
@@ -263,9 +258,16 @@ class Repository private constructor(private val application: Application) :
         request.loadMessages(chatId, idOfLast, getSessionDetails().userId)
     }
 
-    fun refreshCommentsForPost(postId: Long) {
+    suspend fun refreshCommentsForPost(postId: Long) {
         val request = makePostRequests()
-        request.viewCommentsToPost(postId)
+        try {
+            val comments=request.viewCommentsToPost(postId)
+            saveCommentsToDb(comments)
+        }catch (e:UserNotLoginedException){
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
     }
 
     fun getPostsForAccount(userId: Long): LiveData<List<Post>> {
@@ -353,36 +355,11 @@ class Repository private constructor(private val application: Application) :
         }
     }
 
-    fun refreshPostsHome(idOfLast: Long) {
-        CoroutineScope(IO).launch {
-            refreshPostsAsync(idOfLast)
-        }
+    suspend fun commentPost(postId: Long, text: String) {
+        val post = getPostById(postId)
+        commentPost(post, text)
     }
 
-    fun commentPost(postId: Long, text: String) {
-        CoroutineScope(IO).launch {
-            val post = getPostById(postId)
-            commentPostAsync(post, text)
-        }
-    }
-
-    fun commentPost(post: Post, text: String) {
-        CoroutineScope(IO).launch {
-            commentPostAsync(post, text)
-        }
-    }
-
-    fun unLikePost(post: Post) {
-        CoroutineScope(IO).launch {
-            unLikePostAsync(post)
-        }
-    }
-
-    fun likePost(post: Post) {
-        CoroutineScope(IO).launch {
-            likePostAsync(post)
-        }
-    }
 
     fun uploadPost(file: File, description: String) {
         CoroutineScope(IO).launch {
@@ -415,12 +392,6 @@ class Repository private constructor(private val application: Application) :
     fun getMiniPostsForAcc(id: Long, currentUser: User?) {
         CoroutineScope(IO).launch {
             getMiniPostsAsync(id, currentUser)
-        }
-    }
-
-    fun getPostsForAcc(id: Long) {
-        CoroutineScope(IO).launch {
-            getPostsAsync(id)
         }
     }
 
@@ -457,9 +428,15 @@ class Repository private constructor(private val application: Application) :
     }
 
 
-    private suspend fun commentPostAsync(post: Post, text: String) {
+    suspend fun commentPost(post: Post, text: String) {
         val request = makePostRequests()
-        request.commentPost(post.id, text)
+        try {
+            request.commentPost(post.id, text)
+        } catch (e: UserNotLoginedException) {
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
     }
 
 
@@ -515,21 +492,44 @@ class Repository private constructor(private val application: Application) :
         request.search(query)
     }
 
-    private suspend fun likePostAsync(post: Post) {
+    suspend fun likePost(post: Post) {
         val request = makePostRequests()
-        request.likePost(post)
-        postDao.insert(post)
+        try {
+            request.likePost(post)
+            postDao.insert(post)
+            updatePost(post)
+        }catch (e:UserNotLoginedException){
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
     }
 
-    private suspend fun unLikePostAsync(post: Post) {
+    suspend fun unLikePost(post: Post) {
         val request = makePostRequests()
-        request.unLikePost(post)
-        postDao.insert(post)
+        try {
+            request.unLikePost(post)
+            postDao.insert(post)
+            updatePost(post)
+        }
+        catch (e:UserNotLoginedException){
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
     }
 
-    private suspend fun refreshPostsAsync(idOfLast: Long) {
+    suspend fun refreshPostsHome(idOfLast: Long) {
         val request = makePostRequests()
-        request.viewAllPostsHome(idOfLast)
+        try {
+            val posts=request.viewAllPostsHome(idOfLast)
+            savePostsToDb(posts)
+        }catch (e:UserNotLoginedException){
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
+        setFeedRefreshState(false)
     }
 
 
@@ -543,9 +543,16 @@ class Repository private constructor(private val application: Application) :
         request.viewAcc(id, currentUser)
     }
 
-    private suspend fun getPostsAsync(id: Long) {
+    suspend fun getPostsForAcc(id: Long) {
         val request = makePostRequests()
-        request.viewAllPostsAccount(id)
+        try {
+            val posts=request.viewAllPostsAccount(id)
+            savePostsToDb(posts)
+        }catch (e:UserNotLoginedException){
+            makeUserSignIn()
+        }catch (e:UnsuccessfulRequestException){
+
+        }
     }
 
     fun getAllPosts(): LiveData<List<Post>> {
@@ -576,7 +583,7 @@ class Repository private constructor(private val application: Application) :
 
     private fun makePostRequests(): PostRequests {
         val sessionDetails = getSessionDetails()
-        return PostRequests(this, sessionDetails.csrfToken, sessionDetails.sessionId)
+        return PostRequests(sessionDetails.csrfToken, sessionDetails.sessionId)
     }
 
     private fun makeUploadFileRequests(): UploadFileRequests {
@@ -615,6 +622,10 @@ class Repository private constructor(private val application: Application) :
         return LoginStateManager(application).getSessionDetails()
     }
 
+    private fun makeUserSignIn() {
+        isMustSignIn.postValue(true)
+    }
+
     override fun setFollowingCount(userId: Long, count: Long) {
         val userTemp = mUserDao.getUserValue(userId)
         userTemp.followingCount = count
@@ -644,19 +655,19 @@ class Repository private constructor(private val application: Application) :
     }
 
 
-    override fun savePostsToDb(posts: List<Post>) {
+    private fun savePostsToDb(posts: List<Post>) {
         postDao.insertAll(posts)
     }
 
-    override fun saveCommentsToDb(comments: List<Comment>) {
+    fun saveCommentsToDb(comments: List<Comment>) {
         mCommentDao.insertAll(comments)
     }
 
-    override fun updatePost(post: Post) {
+    fun updatePost(post: Post) {
         postDao.insert(post)
     }
 
-    override fun setFeedRefreshState(value: Boolean) {
+    fun setFeedRefreshState(value: Boolean) {
         isRefreshFeed.postValue(value)
     }
 
@@ -702,19 +713,6 @@ class Repository private constructor(private val application: Application) :
             dependencies.addAll(i.toDependencies())
         }
         mDependenciesDao.delete(dependencies)
-    }
-
-    override fun copyToClipboard(text: String) {
-        val manager = application.getSystemService((Context.CLIPBOARD_SERVICE)) as ClipboardManager
-        val clip = ClipData.newPlainText("chat_link", text)
-        manager.setPrimaryClip(clip)
-        CoroutineScope(Main).launch {
-            Toast.makeText(
-                application.applicationContext,
-                application.resources.getText(R.string.copied_to_clipboard),
-                Toast.LENGTH_LONG
-            ).show()
-        }
     }
 
     override fun clearChat(chatId: Long) {

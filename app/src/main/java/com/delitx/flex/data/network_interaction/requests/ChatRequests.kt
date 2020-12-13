@@ -1,9 +1,9 @@
 package com.delitx.flex.data.network_interaction.requests
 
-import android.util.Log
 import com.delitx.flex.Enums.ChatMessageTypes
 import com.delitx.flex.MainData
-import com.delitx.flex.data.network_interaction.ChatMessageUtils
+import com.delitx.flex.data.network_interaction.utils.ChatMessageUtils
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
 import com.delitx.flex.pojo.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -230,7 +230,7 @@ class ChatRequests(
         })
     }
 
-    suspend fun createGroupInvite(chatId: Long): Boolean {
+    suspend fun createGroupInvite(chatId: Long): String {
         val formBody = FormBody.Builder()
             .add("chat_id", chatId.toString())
             .add("csrfmiddlewaretoken", mCsrftoken)
@@ -247,11 +247,10 @@ class ChatRequests(
         if (response.isSuccessful) {
             val body = response.body?.string()
             if (body != null) {
-                mChatRoomInteraction.copyToClipboard(body)
-                return true
+                return body
             }
         }
-        return false
+        throw UnsuccessfulRequestException()
     }
 
     suspend fun checkGroupInvite(chatId: Long, token: String): Boolean {
@@ -282,6 +281,5 @@ class ChatRequests(
         fun removeDependencyFromDB(dependencies: List<UserToChat>)
         fun receiveAddUsers(message: List<AddUserMessage>)
         fun receiveDeleteUsers(message: List<DeleteUserMessage>)
-        fun copyToClipboard(text: String)
     }
 }

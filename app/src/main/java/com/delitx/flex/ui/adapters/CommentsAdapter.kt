@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delitx.flex.pojo.Comment
 import com.delitx.flex.pojo.User
 import com.delitx.flex.R
-import com.delitx.flex.data.network_interaction.LinksUtils
+import com.delitx.flex.data.network_interaction.utils.LinksUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main

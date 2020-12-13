@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.delitx.flex.enums_.MessageSentEnum
 import com.delitx.flex.R
-import com.delitx.flex.data.network_interaction.LinksUtils
+import com.delitx.flex.data.network_interaction.utils.LinksUtils
 import com.delitx.flex.pojo.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

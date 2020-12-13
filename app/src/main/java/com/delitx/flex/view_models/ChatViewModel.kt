@@ -1,12 +1,19 @@
 package com.delitx.flex.view_models
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.delitx.flex.R
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
 import com.delitx.flex.enums_.ChatConnectEnum
 import com.delitx.flex.pojo.Chat
 import com.delitx.flex.pojo.User
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.io.File
@@ -22,7 +29,14 @@ class ChatViewModel(private val app: Application) : BaseViewModel(app) {
         chatConnectStatus = mRepository.chatConnectStatus
     }
     suspend fun generateInviteLink(chatId: Long):Boolean{
-        return mRepository.generateChatInviteLink(chatId)
+        var link:String
+        try {
+            link=mRepository.generateChatInviteLink(chatId)
+        }catch(e: UnsuccessfulRequestException){
+            return false
+        }
+        copyToClipboard(link)
+        return true
     }
 
     suspend fun getUsersByIds(ids: List<Long>): List<User> {
@@ -99,5 +113,18 @@ class ChatViewModel(private val app: Application) : BaseViewModel(app) {
 
     fun refreshChatUsers(chatId: Long) {
         mRepository.refreshChatUsers(chatId)
+    }
+
+    private fun copyToClipboard(text: String) {
+        val manager = app.getSystemService((Context.CLIPBOARD_SERVICE)) as ClipboardManager
+        val clip = ClipData.newPlainText("chat_link", text)
+        manager.setPrimaryClip(clip)
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(
+                app.applicationContext,
+                app.resources.getText(R.string.copied_to_clipboard),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }

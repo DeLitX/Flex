@@ -15,7 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager2.widget.ViewPager2
 import com.delitx.flex.*
-import com.delitx.flex.data.network_interaction.LinksUtils
+import com.delitx.flex.data.network_interaction.utils.LinksUtils
 import com.delitx.flex.ui.activities.ChatActivity
 import com.delitx.flex.ui.activities.SignIn
 import com.delitx.flex.ui.adapters.ViewPagerAdapter

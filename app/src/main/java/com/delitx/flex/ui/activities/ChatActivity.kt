@@ -17,7 +17,7 @@ import com.delitx.flex.ui.adapters.ChatAdapter
 import com.delitx.flex.ui.fragments.ChatUserListRecycler
 import com.delitx.flex.MainData
 import com.delitx.flex.R
-import com.delitx.flex.data.network_interaction.LinksUtils
+import com.delitx.flex.data.network_interaction.utils.LinksUtils
 import com.delitx.flex.enums_.ChatConnectEnum
 import com.delitx.flex.pojo.Chat
 import com.delitx.flex.pojo.ChatMessage

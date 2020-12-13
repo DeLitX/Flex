@@ -3,12 +3,9 @@ package com.delitx.flex.data.network_interaction.requests
 import com.delitx.flex.enums_.RequestEnum
 import com.delitx.flex.MainData
 import com.delitx.flex.data.local.utils.LoginStateManager
-import com.delitx.flex.data.network_interaction.UnsuccessfulRequestException
+import com.delitx.flex.data.network_interaction.exceptions.UnsuccessfulRequestException
 import com.delitx.flex.pojo.User
 import com.google.firebase.iid.FirebaseInstanceId
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import okhttp3.*
 import java.io.IOException
 import java.net.HttpCookie

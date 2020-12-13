@@ -5,14 +5,17 @@ import androidx.lifecycle.LiveData
 import com.delitx.flex.pojo.Comment
 import com.delitx.flex.pojo.Post
 import com.delitx.flex.pojo.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : BaseViewModel(application) {
     var postsInFeed: LiveData<List<Post>>
-    val isRefreshFeed:LiveData<Boolean>
+    val isRefreshFeed: LiveData<Boolean>
 
     init {
-        postsInFeed= mRepository.postsInFeed
-        isRefreshFeed=mRepository.isRefreshFeed
+        postsInFeed = mRepository.postsInFeed
+        isRefreshFeed = mRepository.isRefreshFeed
     }
 
     suspend fun getUserById(userId: Long): User {
@@ -20,7 +23,9 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun refreshCommentsForPost(postId: Long) {
-        mRepository.refreshCommentsForPost(postId)
+        CoroutineScope(IO).launch {
+            mRepository.refreshCommentsForPost(postId)
+        }
     }
 
     suspend fun getCommentsForPost(postid: Long): LiveData<List<Comment>> {
@@ -28,23 +33,33 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun refreshPosts(idOfLast: Long) {
-        mRepository.refreshPostsHome(idOfLast)
+        CoroutineScope(IO).launch {
+            mRepository.refreshPostsHome(idOfLast)
+        }
     }
 
     fun commentPost(postId: Long, text: String) {
-        mRepository.commentPost(postId, text)
+        CoroutineScope(IO).launch {
+            mRepository.commentPost(postId, text)
+        }
     }
 
     fun commentPost(post: Post, text: String) {
-        mRepository.commentPost(post, text)
+        CoroutineScope(IO).launch {
+            mRepository.commentPost(post, text)
+        }
     }
 
     fun unLikePost(post: Post) {
-        mRepository.unLikePost(post)
+        CoroutineScope(IO).launch {
+            mRepository.unLikePost(post)
+        }
     }
 
     fun likePost(post: Post) {
-        mRepository.likePost(post)
+        CoroutineScope(IO).launch {
+            mRepository.likePost(post)
+        }
     }
 
 }
